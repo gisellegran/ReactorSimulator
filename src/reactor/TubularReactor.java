@@ -2,7 +2,9 @@ package reactor;
 
 import chemistry.*;
 import numericalmethods.Euler;
+import reactor.heat_transfer.HeatTransferCondition;
 import reactor.heat_transfer.HeatTransferEquation;
+import reactor.heat_transfer.NonAdiabatic;
 import reactor.pressure_drop.PressureDropEquation;
 
 public abstract class TubularReactor extends Reactor {
@@ -14,11 +16,17 @@ public abstract class TubularReactor extends Reactor {
     private Phase g_phase;
     private ReactionSet g_reactions; //TODO: not sure about having any of these in the reactor class
 
-    private Specie[] g_speciesInReactor;
+    private Specie[] g_speciesInReactor; //TODO try to remove
     private Stream g_inputStream;
-    private int g_tIndex; //index of temperature associated position in array
-    private int g_pIndex; //index of pressure associated position in array
+
+    private int g_Tindex; //index of temperature  in array
+    private int g_Pindex; //index of pressure  in array
+
+    private int g_TaIndex; //index of ambient temperature in array (temperature outside reactor)
     private double g_a; //heat transfer area per unit volume
+    private HeatTransferCondition g_heatCondition;
+
+    private double g_Ta; //ambiant temperature
 
     //main constructor
     public TubularReactor(double size, PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize) {
@@ -42,8 +50,14 @@ public abstract class TubularReactor extends Reactor {
         temp.addAllSpecies(rxns.returnSpecies());
         this.g_speciesInReactor = temp.getSpecies();
         this.g_inputStream = input.clone();
-        this.g_pIndex = this.g_speciesInReactor.length;
-        this.g_tIndex = this.g_speciesInReactor.length+1;
+        this.g_Pindex = this.g_speciesInReactor.length;
+        this.g_Tindex = this.g_speciesInReactor.length+1;
+        this.g_heatCondition = this.getHeatX().getHeatTransferCondition();
+        //we only need to consider Ta when we are in non adiabatic non isothermal conditions
+        if (g_heatCondition != HeatTransferCondition.ADIABATIC && g_heatCondition != HeatTransferCondition.ISOTHERMAL) {
+            this.g_TaIndex = this.g_speciesInReactor.length+2;//index of Ta
+            this.g_Ta = this.getHeatX().getTa0(); //ambiant temperature
+        }
         this.g_a = this.returnA();
 
     }
@@ -53,9 +67,9 @@ public abstract class TubularReactor extends Reactor {
         this.g_reactions = null;
         this.g_speciesInReactor = null;
         this.g_inputStream = null;
-        this.g_tIndex = 0;
-        this.g_pIndex = 0;
-        this.g_a = 0;
+        this.g_Tindex = -1;
+        this.g_Pindex = -1;
+        this.g_a = -1;
     }
 
     //accessors
@@ -74,7 +88,7 @@ public abstract class TubularReactor extends Reactor {
     //point is either weight or volume depending if its g_a PFR of g_a PBR
     public Stream returnReactorOutputAtPoint(double point, Stream input, ReactionSet rxn,
                                              double delX, int maxIt){
-
+        //TODO; implement check that all species in the reactions ar ein the input stream and vice versa
         //checks to make first
         //check for null objects
         if (input == null || rxn == null) {
@@ -94,14 +108,20 @@ public abstract class TubularReactor extends Reactor {
         //get total y array length; length = species + T + P
         int n = this.g_speciesInReactor.length + 2;
 
+        //we only need to consider Ta when we are in non adiabatic non isothermal conditions
+        //this is checked when we set the global variables; if we are not in these conditions, g_TaIndex remains -1
+        //otherwise, we need a spot in the array to store this value
+        if (g_TaIndex > 0) n++;
+
         double[] y_f = new double[n];
         double[] y_0 = new double[n];
 
         //get initial T & P
-        y_0[g_tIndex] = input.getT();
-        y_0[g_pIndex] = input.getP();
+        y_0[g_Tindex] = input.getT();
+        y_0[g_Pindex] = input.getP();
+        if (g_TaIndex > 0) y_0[g_TaIndex] = this.getHeatX().getTa0(); //set Ta0 if we are in non adiabatic/non isothermal conditions
 
-//      //get inlet FlowRates
+        //get inlet FlowRates
         for (int i = 0; i < this.g_speciesInReactor.length; i++) {
             if (input.hasSpecie(this.g_speciesInReactor[i])){
                 y_0[i] = input.returnSpecieFlowRate(this.g_speciesInReactor[i]);
@@ -121,10 +141,10 @@ public abstract class TubularReactor extends Reactor {
     }
 
     protected double returnPDrop(Stream s) {
-        return super.getpDrop().calculateValue(s); //TODO: change this to pressure drop equation
+        return super.getpDrop().calculateValue(s);
     }
     protected double returnHeatX(Stream s) {
-        return super.getHeatX().calculateValue(this.g_a, s, this.g_reactions);
+        return super.getHeatX().calculateDelT(this.g_a, s, this.g_reactions);
     }
 
     public abstract double returnA();
@@ -144,8 +164,8 @@ public abstract class TubularReactor extends Reactor {
         }
 
         //get T and P
-        T = y[this.g_tIndex];
-        P = y[this.g_pIndex];
+        T = y[this.g_Tindex];
+        P = y[this.g_Pindex];
 
         //viscocity stays constant in our case
         viscocity = g_inputStream.getViscosity();
@@ -172,11 +192,14 @@ public abstract class TubularReactor extends Reactor {
 
     }
 
-    public double[] calculateValue(double x, double[] y0){
-        Stream currentOutput = this.getStreamFromY(y0);
-        double[] dely = new double[y0.length];
-        dely[this.g_tIndex] = returnHeatX(currentOutput);
-        dely[this.g_pIndex] = returnPDrop(currentOutput);
+    public double[] calculateValue(double x, double[] y){
+        Stream currentOutput = this.getStreamFromY(y);
+        double[] dely = new double[y.length];
+        dely[this.g_Pindex] = this.getpDrop().calculateValue(currentOutput);
+        dely[this.g_Tindex] = this.getHeatX().calculateDelT(g_a, currentOutput, g_reactions);
+
+        if (!(g_TaIndex<0)) dely[this.g_TaIndex] = ((NonAdiabatic)this.getHeatX()).calculateDelTa(this.g_a, y[g_TaIndex], currentOutput.getT());//calculate delTa if in heat transfer conditions
+
         double[] rates = this.g_reactions.returnNetRxnRates(currentOutput);
         for (int i = 0; i < this.g_speciesInReactor.length; i++) {
             dely[i] = rates[i];

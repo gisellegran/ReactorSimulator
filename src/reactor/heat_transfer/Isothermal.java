@@ -5,8 +5,10 @@ import reactor.NominalPipeSizes;
 import reactor.Stream;
 
 public class Isothermal extends HeatTransferEquation{
-    public Isothermal(double U, double Ta0, NominalPipeSizes pipeSize){
-        super(U, Ta0, pipeSize);
+
+    private static HeatTransferCondition condition = HeatTransferCondition.ISOTHERMAL;
+    public Isothermal(NominalPipeSizes pipeSize){
+        super(0., 0., pipeSize);
     }
     public Isothermal(Isothermal source){
         super(source);
@@ -18,7 +20,7 @@ public class Isothermal extends HeatTransferEquation{
 
     //rhs of the heat transfer equation
     @Override
-    public double calculateValue(double a, Stream s, ReactionSet rxnSet) {
+    public double calculateDelT(double a, Stream s, ReactionSet rxnSet) {
         return 0.;
     }
 

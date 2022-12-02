@@ -1,3 +1,10 @@
+species list
+phase list
+stoichiometric coefficients list
+elementary
+reversible
+
+
 ####Species
     for each species: (or just the name & phase if were limitting to the listed ones)
     name, phase, molarMass, HeatCapacotyCoeffs,

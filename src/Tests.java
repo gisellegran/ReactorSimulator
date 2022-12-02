@@ -253,7 +253,7 @@ public class Tests {/*
 
         Catalyst catalyst = new Catalyst(0.005,0.45,833);
         ErgunPDrop pDrop = new ErgunPDrop(catalyst, pipeSize);
-        System.out.println(pDrop.calculateValue(inletStream));
+        System.out.println(pDrop.calculateDelT(inletStream));
 
 
     }

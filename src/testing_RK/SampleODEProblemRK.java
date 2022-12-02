@@ -93,7 +93,7 @@ public class SampleODEProblemRK implements SetOfODEs
     public double[] calculateValue(double x, double[] y)
     {
         if(y.length!=this.coefficients.length)
-            throw new IllegalArgumentException("calculateValue array y length must match number of slopes entries");
+            throw new IllegalArgumentException("calculateDelT array y length must match number of slopes entries");
         double[] solution = new double[y.length];
         //assume functionality mentioned at top of class, with two entries
             solution[0]=this.coefficients[0]*x/y[0];

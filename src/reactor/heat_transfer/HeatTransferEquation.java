@@ -8,35 +8,44 @@ import reactor.NominalPipeSizes;
 import reactor.Stream;
 
 //maybe rename to tubular
-public class HeatTransferEquation{
-    private HeatTransferCondition condition;
+public abstract class HeatTransferEquation{
 
-    private double Ta; //ambiant temperature
+    private static HeatTransferCondition condition;
+
+    private double Ta0; //ambiant temperature
 
     private double U;//overall heat transfer coefficient
 
-    private double pipeSize;//size of reactor pipe
+    private NominalPipeSizes pipeSize;//size of reactor pipe
 
     //main constructor
-    public HeatTransferEquation(double U, double Ta0, NominalPipeSizes pipeSize){
-        if (condition == null) {
-            //TODO: error handling
-        }
-        this.condition = condition;
+    public HeatTransferEquation(double U, double Ta, NominalPipeSizes pipeSize){
+        if (pipeSize == null) throw new IllegalArgumentException("null pipe size");
+
+        this.U = U;
+        this.Ta0 = Ta;
+        this.pipeSize = pipeSize;
     }
     //copy constructor
     public HeatTransferEquation(HeatTransferEquation source){
-        if (source == null) {
-            //TODO: error handling
-        }
-        this.condition = source.condition;
+        if (source == null) throw new IllegalArgumentException("null source");
+        this.U = source.U;
+        this.Ta0 = source.Ta0;
+        this.pipeSize = source.pipeSize;
     }
 
-    public double calculateEnthalpy()
-    {
-        double enthalpy = 0.;
-        //TODO: implement
-        return enthalpy;
+    public boolean setTa(double Ta) {
+        if (Ta <0) throw new IllegalArgumentException("negative absolute temperature not possible. T is in Kelvins ");
+        this.Ta0 = Ta;
+        return false;
+    }
+
+    public double getTa0(){
+        return this.Ta0;
+    }
+
+    public double getU(){
+        return this.U;
     }
 
     //calculate netDeltaH fpr the conditions of the mixture
@@ -53,7 +62,6 @@ public class HeatTransferEquation{
         return deltaH;
     }
 
-
     private double returnTotalFCp(Stream s){
         Specie[] species = s.getSpecies();
         double[] flowRates = s.getAllFlowRates();
@@ -67,19 +75,21 @@ public class HeatTransferEquation{
     }
 
     private double returnHeatRemoved(double a, double T){
-        return this.U*a*(T-this.Ta);
+        return this.U*a*(T-this.Ta0);
     }
+
+
 
     //a = heat exchange area per unit volume
     //rdelH = heat generated
-    //ua(T-Ta) = heat removed
-    public double calculateValue(double a, Stream s, ReactionSet rxns) {
+    //ua(T-Ta0) = heat removed
+    public double calculateDelT(double a, Stream s, ReactionSet rxns) {
         double T = s.getT();
         return (this.returnHeatGenerated(rxns, s)-this.returnHeatRemoved(a, T))/this.returnTotalFCp(s);
     }
-
+    public HeatTransferCondition getHeatTransferCondition(){
+        return this.condition;
+    };
     //clone
-    public HeatTransferEquation clone(){
-        return new HeatTransferEquation(this);
-    }
+    public abstract HeatTransferEquation clone();
 }
