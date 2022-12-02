@@ -30,7 +30,7 @@ public class PFRDesigner implements SetOfODEs {
         this.rxns = rxns.clone();
         MultiComponentMixture temp = input.clone();
         temp.addAllSpecies(rxns.returnSpecies());
-        this.speciesInReactor = temp.returnAllSpecies();
+        this.speciesInReactor = temp.getSpecies();
         this.input = input.clone();
         this.pIndex = this.speciesInReactor.length;
         this.tIndex = this.speciesInReactor.length+1;

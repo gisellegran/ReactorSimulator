@@ -107,7 +107,7 @@ public class Reaction {
 
         SpecieMap reactionRates = new SpecieMap();
 
-        Specie[] species = mix.returnAllSpecies();
+        Specie[] species = mix.getSpecies();
 
         for (int i = 0; i < species.length; i++) {
             if (this.rxnStoichiometry.hasSpecie(species[i])){

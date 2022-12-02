@@ -39,7 +39,7 @@ public abstract class TubularReactor extends Reactor {
         this.reactions = rxns.clone();
         MultiComponentMixture temp = input.clone();
         temp.addAllSpecies(rxns.returnSpecies());
-        this.speciesInReactor = temp.returnAllSpecies();
+        this.speciesInReactor = temp.getSpecies();
         this.inputStream = input.clone();
         this.pIndex = this.speciesInReactor.length;
         this.tIndex = this.speciesInReactor.length+1;

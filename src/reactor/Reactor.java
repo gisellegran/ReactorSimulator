@@ -41,7 +41,7 @@ public abstract class Reactor implements SetOfODEs {
         this.reactions = rxns.clone();
         MultiComponentMixture temp = mix.clone();
         temp.addAllSpecies(rxns.returnSpecies());
-        this.speciesInReactor = temp.returnAllSpecies();
+        this.speciesInReactor = temp.getSpecies();
     }
 
     protected void resetGlobalVariables(){

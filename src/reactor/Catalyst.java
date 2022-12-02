@@ -1,7 +1,5 @@
 package reactor;
 
-import chemistry.GasDensityCalculator;
-
 public class Catalyst {
     private double particleDiameter;
     private double voidFraction;

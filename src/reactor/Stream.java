@@ -2,8 +2,6 @@ package reactor;
 
 import chemistry.*;
 
-import java.util.Map; // TODO: where is this used
-
 //FIXME: for new map classes
 
 
@@ -18,7 +16,7 @@ public class Stream extends MultiComponentMixture{
     public Stream(CompositionMap composition, double T, double P,
                   double viscocity, double volFlowRate, double molarFlowRate ){
         //TODO do we want to take phase as an input? im not sure
-        super(composition, viscocity, T, P);
+        super(, composition, , viscocity, T, P);
         this.volFlowRate = volFlowRate;
         this.molarFlowRate = molarFlowRate;
 
@@ -75,7 +73,7 @@ public class Stream extends MultiComponentMixture{
     }
     public MolarFlowMap getAllFlowRates(){
         MolarFlowMap flowRates = new MolarFlowMap();
-        Specie[] s = super.returnAllSpecies();
+        Specie[] s = super.getSpecies();
 
         for (int i = 0; i < s.length; i++) {
             flowRates.put(s[i], returnSpecieFlowRate(s[i]));

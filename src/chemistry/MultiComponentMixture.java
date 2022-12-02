@@ -4,51 +4,107 @@ import java.util.Map;
 
 //FIXME make into abstract class
 public abstract class MultiComponentMixture {
-    private CompositionMap composition;
+
+    private Specie[] species;
+    private double[] molComposition;
     private double viscosity;
     private double T;
     private double P;
 
 
     //main constructor
-    public MultiComponentMixture(CompositionMap composition,
+    public MultiComponentMixture(Specie[] species, double[] molComposition,
                                  double viscosity, double T, double P) {
         //TODO check null handling
         //check null array
-        if( composition == null ) System.exit(0);
+        if( species == null) {throw new IllegalArgumentException("species array is null");}
+        if( molComposition == null) {throw new IllegalArgumentException("mol composition array is null");}
+
+        if (species.length != molComposition.length){throw new IllegalArgumentException("species and mol composition array are not the same length");}
+
+        for (int i = 0; i < species.length; i++) {
+            if (species[i] == null) { throw new IllegalArgumentException("specie in array is null");}
+        }
+
+        //check for negative compositions
+        for (int i = 0; i < species.length; i++) {
+            if (molComposition[i] <0 ) { throw new IllegalArgumentException("negative composition was entered");}
+        }
+
+        this.species = new Specie[species.length];
+        this.molComposition = new double[species.length];
 
         //copy values
+        for (int i = 0; i < species.length; i++) {
+            this.species[i] = species[i];
+            this.molComposition[i] = molComposition[i];
+        }
+
         this.viscosity = viscosity;
         this.T = T;
         this.P = P;
 
-        this.composition = composition.clone();
     }
 
     //copy constructor
     public MultiComponentMixture(MultiComponentMixture source) {
 
-        //TODO check null handling
         //check null source
-        if ( source == null ) {System.exit(0);}
+        if ( source == null ) {throw new IllegalArgumentException("source is null");}
+
+        this.species = new Specie[species.length];
+        this.molComposition = new double[species.length];
+
+        //copy values
+        for (int i = 0; i < species.length; i++) {
+            this.species[i] = species[i];
+            this.molComposition[i] = molComposition[i];
+        }
 
         //copy primitive data type values
         this.viscosity = source.viscosity;
         this.T = source.T;
         this.P = source.P;
 
-        this.composition = source.composition.clone();
-
 
     }
 
     //mutators
-    public boolean setComposition(CompositionMap composition) {
-        if (composition == null){
-            //TODO: throw error or false
+
+    public boolean setMolComposition(double[] molComposition) {
+
+        //TODO: are we just supposed to do true or false here
+        if (molComposition == null) { throw new IllegalArgumentException("mol composition array is null");}
+        if (molComposition.length != species.length) {throw new IllegalArgumentException("invalid number of compositions");}
+
+        //check for negative compositions
+        for (int i = 0; i < species.length; i++) {
+            if (molComposition[i] <0 ) { throw new IllegalArgumentException("negative composition was entered");}
         }
 
-        this.composition = composition.clone();
+
+        for (int i = 0; i < species.length; i++) {
+            this.molComposition[i] = molComposition[i];
+        }
+
+        return true;
+    }
+
+    public boolean setSpecies(Specie[] species) {
+        //FIXME: do we need to put return false orexceptions
+        if (species == null) { throw new IllegalArgumentException("species array is null");}
+        if (this.species.length != species.length) {throw new IllegalArgumentException("invalid number of species");}
+
+        //check for negative compositions
+        for (int i = 0; i < species.length; i++) {
+            if (species[i] == null ) { throw new IllegalArgumentException("null element in array");}
+        }
+
+        //copy values
+        for (int i = 0; i < species.length; i++) {
+            this.species[i] = species[i];
+        }
+
         return true;
     }
 
@@ -70,10 +126,15 @@ public abstract class MultiComponentMixture {
 
     //accessors
 
-    public SpecieMap getComposition() {
+    public double[] getComposition() {
         //FIXME: adapt for the composition map
-        return this.composition.clone();
+        double[] temp = new double[molComposition.length];
+        for (int i = 0; i < species.length; i++) {
+            temp[i] = this.molComposition[i];
+        }
+        return temp;
     }
+
 
     public double getT() {
         return T;
@@ -89,7 +150,7 @@ public abstract class MultiComponentMixture {
 
     //class methods
     public boolean isSinglePhase() {
-        Specie[] species = this.returnAllSpecies();
+        Specie[] species = this.getSpecies();
 
         for(int i=1; i<species.length; i++)
             if(species[0].getPhase() != species[i].getPhase()) return false;
@@ -101,7 +162,7 @@ public abstract class MultiComponentMixture {
         Phase phase;
 
         if (this.isSinglePhase()) {
-            phase = this.returnAllSpecies()[0].getPhase();
+            phase = this.getSpecies()[0].getPhase();
         } else {
             phase = Phase.L_G;
         }
@@ -110,43 +171,62 @@ public abstract class MultiComponentMixture {
     }
 
     public int returnNumberOfSpecies(){
-        return composition.size();
+        return species.length;
     }
 
-    public Specie[] returnAllSpecies(){
-        return this.composition.returnAllSpecies();
+    public Specie[] getSpecies(){
+
+        Specie[] temp = new Specie[species.length];
+        for (int i = 0; i < species.length; i++) {
+            temp[i] = this.species[i];
+        }
+        return temp;
     }
 
     public double returnSpecieMolFraction(Specie specie) {
+        if (specie == null) {throw new IllegalArgumentException("specie is null");}
+        for (int i = 0; i < species.length; i++) {
+            if (species[i].equals(specie)){
+                return this.molComposition[i];
+            }
+        }
+
+
         //TODO: if value isnt found it return -1, should it throw error instead
-        return this.composition.getOrDefault(specie, -1.0);
+        return -1.;
     }
 
     public double returnMixtureMolarMass() {
         double molarMass = 0.;
-
-        //iterate through the elements in the map
-        for  (Map.Entry<Specie,Double> elem : this.composition.entrySet()) {
-            molarMass += elem.getKey().getMolarMass()*elem.getValue();
+        for (int i = 0; i < this.species.length; i++) {
+            molarMass += this.species[i].getMolarMass()*molComposition[i];
         }
 
         return molarMass;
     }
 
     public boolean hasSpecie(Specie s){
-        return this.composition.hasSpecie(s);
+        if (s == null) {throw new IllegalArgumentException("specie is null");}
+        for (int i = 0; i < this.species.length; i++) {
+            if (species[i].equals(s)){
+                return true;
+            }
+        }
+        return false;
     }
 
     //adds the specie with a composition of 0
+    //TODO: maybe take this out if not needed
     public boolean addSpecie(Specie s) {
         if (s == null) {
             //TODO: throw error
         }
-        this.composition.addSpecie(s);
+
         return true;
     }
 
     //adds all species which arent already in the mixture with a mol fraction of 0
+    //TODO: maybe take this out if not needed
     public boolean addAllSpecies(Specie[] s){
         if (s == null) {
             //TODO: throw error or
@@ -169,11 +249,14 @@ public abstract class MultiComponentMixture {
     }
 
     public double returnMixtureHeatCapacity(double T) {
+        if (T < 0 ) {throw new IllegalArgumentException("negative absolute temperature. Temperature is in K");}
         double heatCapacity = 0.;
+
         //TODO: check if this is the right formula
-        for  (Map.Entry<Specie,Double> elem : this.composition.entrySet()) {
-            heatCapacity += elem.getKey().returnHeatCapacity(T)*elem.getValue();
+        for (int i = 0; i < this.species.length; i++) {
+            heatCapacity += this.species[i].returnHeatCapacity(T)*this.molComposition[i];
         }
+
        return heatCapacity;
     }
 
@@ -182,14 +265,16 @@ public abstract class MultiComponentMixture {
     public abstract double returnSpecieMolConcentration(Specie s);
 
     public abstract SpecieMap returnAllMolConcentrations();
+
     //clone
     public abstract MultiComponentMixture clone();
 
 
     //toString
-    public String toString(){
+    //TODO: probably remove
+    /*public String toString(){
         return composition.toString()+"\n Viscocity: "+this.viscosity+" | T: "+this.T+" | P: "+this.P;
-    }
+    }*/
     //equals
     public boolean equals(Object obj){
 
@@ -207,7 +292,13 @@ public abstract class MultiComponentMixture {
         if (this.P != objMix.P) return false;
         if (this.viscosity != objMix.viscosity) return false;
 
-        if (!this.composition.equals(objMix.composition));
+        if (this.species.length != objMix.species.length) return false;
+
+        //check species and mol composition
+        for (int i = 0; i < this.species.length; i++) {
+            if(!this.species[i].equals(objMix.species[i])) return false;
+            if(this.molComposition[i] != (objMix.molComposition[i])) return false;
+        }
 
         return true;
 
