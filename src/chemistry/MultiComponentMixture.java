@@ -174,8 +174,8 @@ public abstract class MultiComponentMixture {
 
     public Specie[] getSpecies(){
 
-        Specie[] temp = new Specie[species.length];
-        for (int i = 0; i < species.length; i++) {
+        Specie[] temp = new Specie[this.species.length];
+        for (int i = 0; i < this.species.length; i++) {
             temp[i] = this.species[i];
         }
         return temp;

@@ -49,7 +49,7 @@ public abstract class RateLaw {
         return true;
     }
 
-    public abstract double returnRate(double T, SpecieMap concentrations);
+    public abstract double returnRate(double T, double[] concentrations);
 
     //clone
     public abstract RateLaw clone();

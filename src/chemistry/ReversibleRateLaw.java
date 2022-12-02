@@ -53,7 +53,7 @@ public class ReversibleRateLaw extends RateLaw {
     }
 
     //calculate rate of reaction, returns rate without accounting if it is a consumption or formation rate
-    public double returnRate(double T, SpecieMap concentrations) {
+    public double returnRate(double T, double[] concentrations) {
 
         //TODO: checl that all the species in the reaction are in the concentration map else throw error
         double forwardRate = 0.;
