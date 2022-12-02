@@ -1,10 +1,7 @@
 import chemistry.*;
 import reactor.*;
-import reactor.heat_transfer.HeatTransferCondition;
-import reactor.heat_transfer.HeatTransferEquation;
-import reactor.pressure_drop.ErgunPDrop;
 
-public class Driver_Case2 {
+public class Driver_Case2 {/*
     public static void main(String[] args) {
 
         //ask for what the species are
@@ -33,7 +30,7 @@ public class Driver_Case2 {
         double P = 12; //atm
         double viscosity = 1.8E-5;
 
-        Stream inletStream = StreamBuilder.buildGasStream(molarFlowMap,T,P,viscosity);
+        Stream inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
 
         double[] orders_1 = {0.35,0,0.2,0,0,0,0};
         double[] orders_2 = {-0.27,0,0.88,0,0,0,0};
@@ -77,7 +74,7 @@ public class Driver_Case2 {
         do {
             initialSize = pbr.getSize();
             P = P + 0.5;
-            inletStream = StreamBuilder.buildGasStream(molarFlowMap,T,P,viscosity);
+            inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
             pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(P <= 12.5 && pbr.getSize() <= initialSize);
 
@@ -85,7 +82,7 @@ public class Driver_Case2 {
         do{
             initialSize = pbr.getSize();
             T = T + 10;
-            inletStream = StreamBuilder.buildGasStream(molarFlowMap,T,P,viscosity);
+            inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
             pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(T <= 520 && pbr.getSize() < initialSize);
 
@@ -94,7 +91,7 @@ public class Driver_Case2 {
             initialSize = pbr.getSize();
             molarFlows[0] = molarFlows[0] + 5;
             molarFlowMap = new MolarFlowMap(species,molarFlows);
-            inletStream = StreamBuilder.buildGasStream(molarFlowMap,T,P,viscosity);
+            inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
             pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(pbr.getSize() < initialSize);
 
@@ -102,27 +99,27 @@ public class Driver_Case2 {
             initialSize = pbr.getSize();
             molarFlows[1] = molarFlows[1] + 5;
             molarFlowMap = new MolarFlowMap(species,molarFlows);
-            inletStream = StreamBuilder.buildGasStream(molarFlowMap,T,P,viscosity);
+            inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
             pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(pbr.getSize() < initialSize);
 
         //TODO: fix this
-        /*
+
         do {
             initialSize = pfr.getSize();
             molarFlows[2] = molarFlows[2] + 5;
             molarFlowMap = new MolarFlowMap(species,molarFlows);
-            inletStream = StreamBuilder.buildGasStream(molarFlowMap,T,P,viscosity,volFlow);
+            inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity,volFlow);
             pfr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(inletStream.returnSpecieMolConcentration(species[2]) <= 0.2*inletStream.returnTotalConcentration() && pfr.returnReactorOutput(species[2]) <= 0.2*inletStream.returnTotalConcentration() && size < );
 
 
-         */
+
         do {
             initialSize = pbr.getSize();
             molarFlows[6] = molarFlows[6] + 5;
             molarFlowMap = new MolarFlowMap(species,molarFlows);
-            inletStream = StreamBuilder.buildGasStream(molarFlowMap,T,P,viscosity);
+            inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
             pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(pbr.getSize() < initialSize);
 
@@ -134,4 +131,4 @@ public class Driver_Case2 {
         System.out.println("The reactor volume needed is: "+pbr.getSize());
 
     }
-}
+*/}

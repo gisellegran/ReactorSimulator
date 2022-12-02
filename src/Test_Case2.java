@@ -8,7 +8,7 @@ import reactor.heat_transfer.HeatTransferEquation;
 import reactor.pressure_drop.Isobaric;
 import reactor.pressure_drop.PressureDropEquation;
 
-public class Test_Case2 {
+public class Test_Case2 {/*
     public static void main(String[] args) {
         //first create the reaction species
         Specie specieA = new Specie("A", Phase.LIQUID, Element.A.molarMass, Element.A.heatCapacityCoefficients);
@@ -57,5 +57,5 @@ public class Test_Case2 {
         System.out.println("Rector size found:"+output.getSize());
         System.out.println("Actual reactor size: 600L");
         //System.out.println(TubularReactor.returnConversion(specieA, stream, output));
-    }
+   */ }
 }

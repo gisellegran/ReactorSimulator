@@ -153,18 +153,15 @@ public abstract class TubularReactor extends Reactor {
 
         for (int i = 0; i < flowRates.length; i++) { flowRates[i] = y[i]; }
 
-        //create MolarFlowMap
-        MolarFlowMap flowMap = new MolarFlowMap(this.speciesInReactor, flowRates);
-
         Stream result = null;
         if (this.phase == Phase.IDEALGAS) {
             //gas is compressible
-            result = StreamBuilder.buildGasStream(flowMap, T, P, viscocity);
+            result = StreamBuilder.buildGasStreamFromMolFlows(this.speciesInReactor, flowRates, T, P, viscocity);
         }
         else if (this.phase == Phase.LIQUID) {
             //assume constant density => constant flow rate
             double volFlow = inputStream.getVolFlowRate();
-            result = StreamBuilder.buildStream(flowMap, T, P, viscocity, volFlow);}
+            result = StreamBuilder.buildStreamFromMolFlows(this.speciesInReactor, flowRates, T, P, viscocity, volFlow);}
         else {
             //TODO: throw error
         }

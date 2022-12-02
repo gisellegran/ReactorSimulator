@@ -7,7 +7,7 @@ import reactor.heat_transfer.HeatTransferEquation;
 import reactor.pressure_drop.PressureDropEquation;
 
 
-public class PBRDesigner implements SetOfODEs {
+public class PBRDesigner extends TubularReactorDesigner {
 
 
     //Global variables
@@ -159,52 +159,10 @@ public class PBRDesigner implements SetOfODEs {
         return dely;
     }
 
-    protected Stream getStreamFromY(double[] y) {
-        //TODO: error handling
-        if (y == null) {
-        }
-
-        double T, P, viscocity, volFlow;
-
-        //make local deep copy of y
-        double[] tempY = new double[y.length];
-
-        for (int i = 0; i < tempY.length; i++) {
-            tempY[i] = y[i];
-        }
-
-        //get T and P
-        T = y[this.tIndex];
-        P = y[this.pIndex];
-
-        //viscocity stays constant in our case
-        viscocity = input.getViscosity();
-
-        //put flow rates in an array
-        double[] flowRates = new double[tempY.length - 2];
-
-        for (int i = 0; i < flowRates.length; i++) {
-            flowRates[i] = y[i];
-        }
-
-        //create MolarFlowMap
-        MolarFlowMap flowMap = new MolarFlowMap(this.speciesInReactor, flowRates);
-
-        //get the flow rate of the stream of the stream
-        volFlow = -1.;
-        if (this.phase == Phase.IDEALGAS) {
-            //gas is compressible
-            volFlow = this.returnOutputGasVolFlowRate(flowMap.returnTotalMolarFlow(), T, P);
-        } else if (this.phase == Phase.LIQUID) {
-            //assume constant density => constant flow rate
-            volFlow = input.getVolFlowRate();
-        } else {
-            //TODO: throw error
-        }
-
-        return StreamBuilder.buildStream(flowMap, T, P, viscocity, volFlow);
+    //todo: fix
+    public PBR buildReactor(double size, PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize){
+        return null;
     }
-
 
     protected double returnOutputGasVolFlowRate(double FT, double T, double P) {
         double v0, FT0, P0, T0;

@@ -71,12 +71,12 @@ public class Stream extends MultiComponentMixture{
 
         return super.returnSpecieMolFraction(s)*molarFlowRate;
     }
-    public MolarFlowMap getAllFlowRates(){
-        MolarFlowMap flowRates = new MolarFlowMap();
-        Specie[] s = super.getSpecies();
-
-        for (int i = 0; i < s.length; i++) {
-            flowRates.put(s[i], returnSpecieFlowRate(s[i]));
+    public double[] getAllFlowRates(){
+        int n = this.returnNumberOfSpecies(); //number of species in the stream
+        double[] molComp = this.getMolComposition();
+        double[] flowRates = new double[n];
+        for (int i = 0; i < n; i++) {
+            flowRates[i] = molComp[i] * this.molarFlowRate;
         }
         return flowRates;
     }
@@ -103,12 +103,12 @@ public class Stream extends MultiComponentMixture{
     };
 
     //todo: probably remove if not needed
-    public boolean setSpecieFlowRate(Specie s, double flowRate){
+    /*public boolean setSpecieFlowRate(Specie s, double flowRate){
 
         if (s == null) {
             //todo: throw error
         }
-        MolarFlowMap map = this.getAllFlowRates();
+        //MolarFlowMap map = this.getAllFlowRates();
 
         //update species molar flow
         map.replace(s, flowRate);
@@ -126,7 +126,7 @@ public class Stream extends MultiComponentMixture{
 
         return true;
 
-    }
+    }*/
 
     //clone
     public Stream clone(){

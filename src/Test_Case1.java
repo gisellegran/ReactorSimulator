@@ -7,7 +7,7 @@ import reactor.pressure_drop.PressureDropEquation;
 
 import java.text.DecimalFormat;
 
-public class Test_Case1 {
+public class Test_Case1 {/*
     public static void main(String[] args) {
 
         System.out.println("Creating species objects for A, B, & C..");
@@ -75,7 +75,9 @@ public class Test_Case1 {
         inletFlowRates[0] = 15;
         inletFlowRates[1] = 15;
         inletFlowRates[2] = 0;
-        MolarFlowMap molarFlowMap = new MolarFlowMap(species, inletFlowRates);
+
+        //TODO: change to array
+        //MolarFlowMap molarFlowMap = new MolarFlowMap(species, inletFlowRates);
         Stream inletStream = StreamBuilder.buildStream(molarFlowMap, T, P, viscosity, inletVolFlowrate);
         System.out.println("Inlet Stream Creation Completed");
 
@@ -92,4 +94,4 @@ public class Test_Case1 {
         System.out.println("Calculated output concentration for the PFR"+outputStream.returnAllMolConcentrations());
         System.out.println("As a percentage, the % conversion of A is: "+df.format(PFR.returnConversion(species[0],inletStream,outputStream)*100)+"%");
     }
-}
+*/}

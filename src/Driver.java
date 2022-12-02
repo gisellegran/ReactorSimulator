@@ -8,7 +8,7 @@ import reactor.pressure_drop.PressureDropEquation;
 import java.util.Scanner;
 import java.util.regex.MatchResult;
 
-public class Driver {
+public class Driver {/*
 
     private static Specie specieBuilder(String elem, String phase){
         if (elem == null ) {
@@ -211,7 +211,8 @@ public class Driver {
                 }
 
                 //TODO: add stream builder for the gerenal case of having just composition map or just the arrays directly + classifier (composition or molar fllow)
-                inletStream = new Stream(, new CompositionMap(allSpecies, composition), , T, P, viscosity, inletVolFlowrate, totalFlow);
+                //todo: change to arrays
+                //inletStream = new Stream(, new CompositionMap(allSpecies, composition), , T, P, viscosity, inletVolFlowrate, totalFlow);
                 break;
 
             case 2:
@@ -227,14 +228,14 @@ public class Driver {
 
 
             //TODO: add this back in
-            /*
-            System.out.println("Is the reaction an elementary reaction? Enter True if elementary, False if not:  ");
-            boolean isElementary = scan.nextBoolean();
-            if (isElementary == true)
-                for (int i = 0; i < n; i++)
-                    orders[i] = stoichCoeff[i];
 
-            */
+            //System.out.println("Is the reaction an elementary reaction? Enter True if elementary, False if not:  ");
+            //boolean isElementary = scan.nextBoolean();
+            //if (isElementary == true)
+                //for (int i = 0; i < n; i++)
+                   // orders[i] = stoichCoeff[i];
+
+            //
 
         //INTEGRATION
         System.out.println("Choose the step size for Euler's method: ");
@@ -247,4 +248,4 @@ public class Driver {
         scan.close();
 
     }
-}
+*/}

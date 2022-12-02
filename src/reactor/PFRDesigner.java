@@ -73,7 +73,7 @@ public class PFRDesigner implements SetOfODEs {
     }
 
     public PFR returnVForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns,
-                                    PressureDropEquation pDrop, HeatTransferEquation heatX, double delX, int maxIt){
+                                    PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize, double delX, int maxIt){
         setGlobalVariables(rxns, input, pDrop, heatX);
 
         //get total y array length; length = species + T + P
@@ -136,7 +136,7 @@ public class PFRDesigner implements SetOfODEs {
             System.out.println("input does not converge");
             System.exit(0);
         }
-        PFR result = new PFR(xf, pDrop, heatX);
+        PFR result = new PFR(xf, pDrop, heatX, pipeSize);
         resetGlobalVariables();
 
         //generate stream
@@ -161,7 +161,7 @@ public class PFRDesigner implements SetOfODEs {
         if (y == null) {
         }
 
-        double T, P, viscocity, volFlow;
+        double T, P, viscocity;
 
         //make local deep copy of y
         double[] tempY = new double[y.length];
@@ -184,22 +184,20 @@ public class PFRDesigner implements SetOfODEs {
             flowRates[i] = y[i];
         }
 
-        //create MolarFlowMap
-        MolarFlowMap flowMap = new MolarFlowMap(this.speciesInReactor, flowRates);
-
-        //get the flow rate of the stream of the stream
-        volFlow = -1.;
+        Stream result = null;
         if (this.phase == Phase.IDEALGAS) {
             //gas is compressible
-            volFlow = this.returnOutputGasVolFlowRate(flowMap.returnTotalMolarFlow(), T, P);
-        } else if (this.phase == Phase.LIQUID) {
+            result = StreamBuilder.buildGasStreamFromMolFlows(this.speciesInReactor, flowRates, T, P, viscocity);
+        }
+        else if (this.phase == Phase.LIQUID) {
             //assume constant density => constant flow rate
-            volFlow = input.getVolFlowRate();
+            double volFlow = input.getVolFlowRate();
+            result = StreamBuilder.buildStreamFromMolFlows(this.speciesInReactor, flowRates, T, P, viscocity, volFlow);
         } else {
             //TODO: throw error
         }
 
-        return StreamBuilder.buildStream(flowMap, T, P, viscocity, volFlow);
+        return result;
     }
 
 

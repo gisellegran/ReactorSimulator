@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class Test {
+public class Test {/*
 
     public static void main(String[] args) {
         int n=2;
@@ -17,4 +17,4 @@ public class Test {
             inletFlowRates[i] = scan4.nextDouble();
         }
     }
-}
+*/}

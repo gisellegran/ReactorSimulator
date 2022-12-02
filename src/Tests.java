@@ -3,7 +3,7 @@ import reactor.*;
 import reactor.pressure_drop.*;
 import reactor.heat_transfer.*;
 
-public class Tests {
+public class Tests {/*
 
     //method to print a double result and the expected double value to see
     public static void testPrint(double value, double expectedVal){
@@ -219,7 +219,7 @@ public class Tests {
         double P = 12; //atm
         double viscosity = 1.8E-5;
 
-        Stream inletStream = StreamBuilder.buildGasStream(molarFlowMap,T,P,viscosity);
+        Stream inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
 
         double[] orders_1 = {0.35,0,0.2,0,0,0,0};
         double[] orders_2 = {-0.27,0,0.88,0,0,0,0};
@@ -312,4 +312,4 @@ public class Tests {
     }
 
 
-}
+/*}

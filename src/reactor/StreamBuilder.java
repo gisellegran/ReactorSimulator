@@ -37,7 +37,7 @@ public class StreamBuilder {
     }
 
 
-    public static Stream buildGasStream(Specie[] species, double[] molFlows, double T, double P, double viscocity) {
+    public static Stream buildGasStreamFromMolFlows(Specie[] species, double[] molFlows, double T, double P, double viscocity) {
         double totalMolFlow = StreamBuilder.returnTotalMolFlow(molFlows);
         double volFlowRate = StreamBuilder.returnGasVolFLow(totalMolFlow, T, P);
         //now that we have the total vol flow rate, we can just use the buildStreamFromMolFlows method instead of repeating the same code
