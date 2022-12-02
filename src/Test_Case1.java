@@ -2,12 +2,13 @@ import chemistry.*;
 import reactor.*;
 import reactor.heat_transfer.HeatTransferCondition;
 import reactor.heat_transfer.HeatTransferEquation;
+import reactor.heat_transfer.Isothermal;
 import reactor.pressure_drop.Isobaric;
 import reactor.pressure_drop.PressureDropEquation;
 
 import java.text.DecimalFormat;
 
-public class Test_Case1 {/*
+public class Test_Case1 {
     public static void main(String[] args) {
 
         System.out.println("Creating species objects for A, B, & C..");
@@ -20,10 +21,8 @@ public class Test_Case1 {/*
         System.out.println("Species Creation Completed");
 
         System.out.println("Now the components of the reaction to build the reaction will be created");
-        System.out.println("First, we create the stoichiometry map defining the reaction. THe coefficients are as follows: {A:-1, B:-2, C:1}");
+        System.out.println("First, we create the stoichiometry array defining the reaction. THe coefficients are as follows: {A:-1, B:-2, C:1}");
         double[] stoichCoeff = new double[] {-1,-2,1};
-        StoichiometryMap stoichiometryMap = new StoichiometryMap(species, stoichCoeff);
-        System.out.println("Stoichiometry map creation completed");
 
         System.out.println("Next, we create the rate constant with A = 100 and activation energy = 0. THe reference specie of the rate is specie A.");
         Specie refSpecies = species[0];
@@ -32,8 +31,7 @@ public class Test_Case1 {/*
 
         System.out.println("Now we create the rate law which is in the power form. Since the reaciton is elementary, the orders are as follows: {A:1, B:2, C:0}");
         double[] orders = new double[] {1,2,0};
-        SpecieMap orderMap = new SpecieMap(species, orders);
-        RateLaw refReactionRate = new PowerRateLaw(rateConstant, refSpecies, orderMap);
+        RateLaw refReactionRate = new PowerRateLaw(rateConstant, refSpecies, orders);
         System.out.println("Rate Law Creation Completed");
 
         System.out.println("The final component for the creation of the reaction is the reference enthalpy of the reaction" +
@@ -42,17 +40,19 @@ public class Test_Case1 {/*
         System.out.println("Reference Enthalpy Creation Completed");
 
         System.out.println("Finally, the rate law, stoichiometry map and reaction enthalpy are combined to build a reaction object." );
-        Reaction rxn = new Reaction(refReactionRate, stoichiometryMap, refEnthalpy);
+        Reaction rxn = new Reaction(refReactionRate, species, stoichCoeff, refEnthalpy);
         System.out.println("Reaction Creation Completed");
 
         System.out.println("Now the reactor object will be built. " +
                 "\nThe reactor is isothermal and isobaric so the corresponding heat transfer and pressure drop equation objects are created.");
+        NominalPipeSizes pipeSize = NominalPipeSizes.ONE_INCH; //default
         HeatTransferCondition condition = HeatTransferCondition.ISOTHERMAL;
-        HeatTransferEquation heatTransferEquation = new HeatTransferEquation(condition, refEnthalpy);
+        HeatTransferEquation heatTransferEquation = new Isothermal(0, 0, pipeSize);
         PressureDropEquation pDrop = new Isobaric();
+
         System.out.println("Pressure Drop and Heat Transfer Equation Creation Completed");
         System.out.println("The reactor has a volume of 600L. Combining that with the pressure drop and heat transfer equation we can build the reactor object.");
-        PFR pfr = new PFR(600,pDrop,heatTransferEquation);
+        PFR pfr = new PFR(600,pDrop,heatTransferEquation, pipeSize);
         System.out.println("Reactor Creation Completed");
 
 
@@ -76,9 +76,7 @@ public class Test_Case1 {/*
         inletFlowRates[1] = 15;
         inletFlowRates[2] = 0;
 
-        //TODO: change to array
-        //MolarFlowMap molarFlowMap = new MolarFlowMap(species, inletFlowRates);
-        Stream inletStream = StreamBuilder.buildStream(molarFlowMap, T, P, viscosity, inletVolFlowrate);
+        Stream inletStream = StreamBuilder.buildStreamFromMolFlows(species, inletFlowRates, T, P, viscosity, inletVolFlowrate);
         System.out.println("Inlet Stream Creation Completed");
 
         System.out.println("Now the PFR can solve the performance problem by calling the returnReactorOutput() method. We pass the inlet stream, reaction set " +
@@ -89,9 +87,18 @@ public class Test_Case1 {/*
         System.out.println("Expected output concentration for the PFR (testFlowReactor()): { A: 8.209693911, B: 1.419387822, C: 6.790306089}");
         System.out.println("Expected conversion of A: 0.452687073");
         System.out.println("Expected output flow rates for the PFR (testFlowReactor()): {A:0.068414116, B: 0.011828232, C: 0.056585884 }");
-        System.out.println("Calculated Molar Flowrates of all the species: " +outputStream.getAllFlowRates());
+        System.out.println("Calculated Molar Flowrates of all the species: " +Test_Case1.arrayString(species, outputStream.getAllFlowRates()));
         System.out.println("Calculated Fractional conversion of A: " +df.format(PFR.returnConversion(species[0],inletStream,outputStream)));
-        System.out.println("Calculated output concentration for the PFR"+outputStream.returnAllMolConcentrations());
+        System.out.println("Calculated output concentration for the PFR"+Test_Case1.arrayString(species, outputStream.returnAllMolConcentrations()));
         System.out.println("As a percentage, the % conversion of A is: "+df.format(PFR.returnConversion(species[0],inletStream,outputStream)*100)+"%");
     }
-*/}
+
+    public static String arrayString(Specie[] s, double[] array){
+        DecimalFormat df = new DecimalFormat("0.0000");
+        String str = "";
+        for (int i = 0; i < array.length; i++) {
+            str += (s[i].getName()+": "+df.format(array[i])+", ");
+        }
+        return "{ "+str+" }";
+    }
+}

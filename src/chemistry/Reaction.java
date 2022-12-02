@@ -44,9 +44,15 @@ public class Reaction {
     public Reaction (Reaction source)
     {
         if(source==null) System.exit(0);
-        this.refReactionRate = source.refReactionRate.clone();
+        this.species = new Specie[source.species.length];
+        this.stoichiometry = new double[source.stoichiometry.length];
 
-        this.stoichiometry = source.stoichiometry.clone();
+        //do species and stoichionmetry at the same time since theyre the same legnth
+        for (int i = 0; i < source.stoichiometry.length; i++) {
+            this.species[i] = source.species[i];
+            this.stoichiometry[i] = source.stoichiometry[i];
+        }
+        this.refReactionRate = source.refReactionRate.clone();
 
         this.refEnthalpy = source.refEnthalpy.clone();
     }

@@ -153,7 +153,7 @@ public class PBRDesigner extends TubularReactorDesigner {
         dely[this.pIndex] = returnPDrop();
         double[] rates = this.rxns.returnNetRxnRates(y0[this.tIndex], currentOutput);
         for (int i = 0; i < this.speciesInReactor.length; i++) {
-            dely[i] = rates.get(this.speciesInReactor[i]);
+            dely[i] = rates[i];
         }
 
         return dely;

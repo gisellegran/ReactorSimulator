@@ -50,13 +50,13 @@ public abstract class MultiComponentMixture {
         //check null source
         if ( source == null ) {throw new IllegalArgumentException("source is null");}
 
-        this.species = new Specie[species.length];
-        this.molComposition = new double[species.length];
+        this.species = new Specie[source.species.length];
+        this.molComposition = new double[source.species.length];
 
         //copy values
-        for (int i = 0; i < species.length; i++) {
-            this.species[i] = species[i];
-            this.molComposition[i] = molComposition[i];
+        for (int i = 0; i < source.species.length; i++) {
+            this.species[i] = source.species[i];
+            this.molComposition[i] = source.molComposition[i];
         }
 
         //copy primitive data type values
