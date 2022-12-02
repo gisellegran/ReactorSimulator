@@ -178,14 +178,14 @@ public class Reaction {
     private double returnDeltaC(double T){
         double deltaC = 0.;
         //get the absolute value of the reference specie in order to obtain the normalized & generalized stoichiometric coefficients
-        double absRefStoich = Math.abs(this.stoichiometry.get(this.refReactionRate.getRefSpecie())); //stoichiometric coefficient of the refference specie of the reaction
+        double refV = Math.abs(this.stoichiometry[g_refI]);//stoichiometric coefficient of the refference specie of the reaction
 
-        //iterate through the map to calculate the
-        for (Map.Entry<Specie, Double> entry : this.stoichiometry.entrySet()) {
-            double Ci = entry.getKey().returnHeatCapacity(T); //species i heat capacity at T
-            double stoichCoeff = entry.getValue(); //stoichiometric coefficient of species i
-            deltaC += (stoichCoeff/absRefStoich)*Ci; // add Cp_i * v_i/|v_ref|
+        for (int i = 0; i < this.species.length; i++) {
+            double Ci = species[i].returnHeatCapacity(T);//species i heat capacity at T
+            double stoichCoeff = this.stoichiometry[i]; //stoichiometric coefficient of species i
+            deltaC += (stoichCoeff/refV)*Ci;// add Cp_i * v_i/|v_ref|
         }
+
         return deltaC;
     }
 
