@@ -24,7 +24,7 @@ public class Reaction {
 
         //TODO; throw error if ref species is not in the species list
 
-        if (species.length != stoichiometry.length) {throw new IllegalArgumentException("array length mismatch")}
+        if (species.length != stoichiometry.length) {throw new IllegalArgumentException("array length mismatch");}
         for (int i = 0; i < species.length; i++) {
             if (species[i] == null ) {throw new IllegalArgumentException("null element in array");}
         }
@@ -80,8 +80,9 @@ public class Reaction {
         return this.refEnthalpy.clone();
     }
 
-    public Specie[] setSpecies(){
+    public boolean setSpecies(){
         // todo: implement
+        return true;
     }
     //mutators
     public boolean setRefReactionRate(RateLaw refReactionRate) {
@@ -120,7 +121,16 @@ public class Reaction {
         return temp;
     }
 
-    public double returnSpecieStoichCoeff(Specie s) { return this.stoichiometry.returnSpecieStoichCoeff(s);}
+    public double returnSpecieStoichCoeff(Specie s) {
+        //find index of specie
+        int index = -1;
+        for (int i = 0; i < this.species.length; i++) {
+            if (this.species[i].equals(s)){
+                index = i;
+                break;
+            }
+        }
+        return index;}
     public boolean hasSpecie(Specie s){
         if (s == null) {throw new IllegalArgumentException("specie is null");}
         for (int i = 0; i < this.species.length; i++) {

@@ -137,7 +137,9 @@ public class PBRDesigner implements SetOfODEs {
             System.out.println("input does not converge");
             System.exit(0);
         }
-        PBR result = new PBR(xf, pDrop, heatX);
+
+        NominalPipeSizes pipeSize = NominalPipeSizes.ONE_INCH;
+        PBR result = new PBR(xf, pDrop, heatX, pipeSize);
         resetGlobalVariables();
 
         //generate stream
