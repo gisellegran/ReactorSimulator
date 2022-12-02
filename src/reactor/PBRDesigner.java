@@ -151,7 +151,7 @@ public class PBRDesigner extends TubularReactorDesigner {
         double[] dely = new double[y0.length];
         dely[this.tIndex] = returnHeatX();
         dely[this.pIndex] = returnPDrop();
-        SpecieMap rates = this.rxns.returnNetRxnRates(y0[this.tIndex], currentOutput);
+        double[] rates = this.rxns.returnNetRxnRates(y0[this.tIndex], currentOutput);
         for (int i = 0; i < this.speciesInReactor.length; i++) {
             dely[i] = rates.get(this.speciesInReactor[i]);
         }

@@ -7,6 +7,7 @@ public class ReactionSet {
 
     //constructor
     public ReactionSet(Reaction[] reactions) {
+        //todo: error if all the reactions dont have the same number of species
         if(reactions==null) System.exit(0);
         for(int i=0;i<reactions.length;i++)
             if(reactions[i]==null) System.exit(0);
@@ -81,21 +82,19 @@ public class ReactionSet {
 
     }
 
-    public SpecieMap returnNetRxnRates(double T, MultiComponentMixture mix) {
-        SpecieMap netReactionRates = new SpecieMap();
+    public double[] returnNetRxnRates(double T, MultiComponentMixture mix) {
+        int n = this.returnNumberOfSpecies();//number of species in all the reactions
+        double[] netReactionRates = new double[n];
 
         //iterate through the reactions
         for (int i = 0; i < this.reactions.length; i++) {
-            SpecieMap rxnRates = this.reactions[i].calcAllReactionRates(T, mix);
+            double[] rxnRates = this.reactions[i].calcAllReactionRates(T, mix);
 
             //iterate through the elements of the reaction
-            for (Map.Entry<Specie, Double> elem : rxnRates.entrySet()) {
-                if (netReactionRates.hasSpecie(elem.getKey())) {
-                    netReactionRates.replace(elem.getKey().clone(), netReactionRates.get(elem.getKey())+elem.getValue());
-                } else {
-                    netReactionRates.put(elem.getKey().clone(), elem.getValue());
-                }
+            for (int j = 0; j < n; j++) {
+                netReactionRates[j] += rxnRates[j];
             }
+
         }
          return netReactionRates;
 

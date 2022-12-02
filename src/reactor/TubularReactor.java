@@ -175,9 +175,9 @@ public abstract class TubularReactor extends Reactor {
         double[] dely = new double[y0.length];
         dely[this.tIndex] = returnHeatX();
         dely[this.pIndex] = returnPDrop(currentOutput);
-        SpecieMap rates = this.reactions.returnNetRxnRates(y0[this.tIndex], currentOutput);
+        double[] rates = this.reactions.returnNetRxnRates(y0[this.tIndex], currentOutput);
         for (int i = 0; i < this.speciesInReactor.length; i++) {
-            dely[i] = rates.get(this.speciesInReactor[i]);
+            dely[i] = rates[i];
         }
 
         return dely;

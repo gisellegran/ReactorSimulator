@@ -1,12 +1,8 @@
 package reactor.heat_transfer;
 
-import chemistry.RefValue;
 import chemistry.Specie;
-import chemistry.SpecieMap;
 import reactor.NominalPipeSizes;
 import reactor.Stream;
-
-import java.util.Map;
 
 public class HeatTransferEquation{
     private HeatTransferCondition condition;
@@ -43,11 +39,12 @@ public class HeatTransferEquation{
     //calculate deltaH for heat transfer equation
     //deltaH = sum(Fi*(Hi-Hi_0)
     private double returnDeltaH(Stream s0, double T){
-        SpecieMap flowRates = s0.getAllFlowRates();
+        Specie[] species = s0.getSpecies();
+        double[] flowRates = s0.getAllFlowRates();
         double T0 = s0.getT();
         double deltaH = 0;
-        for (Map.Entry<Specie,Double> s: flowRates.entrySet()){
-            deltaH += s.getValue()*s.getKey().returnIntegralHeatCapacity(T0, T);
+        for (int i = 0; i < flowRates.length; i++) {
+            deltaH += flowRates[i]*species[i].returnIntegralHeatCapacity(T0, T);
         }
 
         return deltaH;
@@ -55,10 +52,11 @@ public class HeatTransferEquation{
 
 
     private double returnTotalFCp(Stream s, double T){
-        SpecieMap flowRates = s.getAllFlowRates();
+        Specie[] species = s.getSpecies();
+        double[] flowRates = s.getAllFlowRates();
         double FCp = 0;
-        for (Map.Entry<Specie,Double> specie: flowRates.entrySet()){
-            FCp += specie.getValue()*specie.getKey().returnHeatCapacity(T);
+        for (int i = 0; i < flowRates.length; i++) {
+            FCp += flowRates[i]*species[i].returnHeatCapacity(T);
         }
 
         return FCp;
