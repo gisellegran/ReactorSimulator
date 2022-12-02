@@ -1,9 +1,13 @@
 package reactor.heat_transfer;
 
+import chemistry.MultiComponentMixture;
+import chemistry.Reaction;
+import chemistry.ReactionSet;
 import chemistry.Specie;
 import reactor.NominalPipeSizes;
 import reactor.Stream;
 
+//maybe rename to tubular
 public class HeatTransferEquation{
     private HeatTransferCondition condition;
 
@@ -35,25 +39,25 @@ public class HeatTransferEquation{
         return enthalpy;
     }
 
-    //TODO: remove
-    //calculate deltaH for heat transfer equation
-    //deltaH = sum(Fi*(Hi-Hi_0)
-    private double returnDeltaH(Stream s0, double T){
-        Specie[] species = s0.getSpecies();
-        double[] flowRates = s0.getAllFlowRates();
-        double T0 = s0.getT();
-        double deltaH = 0;
-        for (int i = 0; i < flowRates.length; i++) {
-            deltaH += flowRates[i]*species[i].returnIntegralHeatCapacity(T0, T);
+    //calculate netDeltaH fpr the conditions of the mixture
+    //rDeltaH = sum(rij*DeltaH_ij)
+    //mix has temperature at which to calculate the deltaH
+    public double returnHeatGenerated(ReactionSet rxnSet, MultiComponentMixture mix){
+        Reaction[] rxns = rxnSet.getReactions();
+        double deltaH = 0.;
+        double T = mix.getT();
+        for (int i = 0; i < rxns.length; i++) {
+            deltaH += rxns[i].returnReactionEnthalpy(T)*rxns[i].calcRefReactionRate(mix);
         }
 
         return deltaH;
     }
 
 
-    private double returnTotalFCp(Stream s, double T){
+    private double returnTotalFCp(Stream s){
         Specie[] species = s.getSpecies();
         double[] flowRates = s.getAllFlowRates();
+        double T = s.getT();
         double FCp = 0;
         for (int i = 0; i < flowRates.length; i++) {
             FCp += flowRates[i]*species[i].returnHeatCapacity(T);
@@ -62,17 +66,16 @@ public class HeatTransferEquation{
         return FCp;
     }
 
-    private double returnHeatRemoved(double U, double a, double T){
-        return U*a*(T-this.Ta);
+    private double returnHeatRemoved(double a, double T){
+        return this.U*a*(T-this.Ta);
     }
 
-    //heat exchange area per unit volume
+    //a = heat exchange area per unit volume
     //rdelH = heat generated
     //ua(T-Ta) = heat removed
-    public double calculateValue(double a, Stream s, double T, double rdelH)
-
-    {
-        return (rdelH-this.returnHeatRemoved(this.U,a, T))/this.returnTotalFCp(s,T);
+    public double calculateValue(double a, Stream s, ReactionSet rxns) {
+        double T = s.getT();
+        return (this.returnHeatGenerated(rxns, s)-this.returnHeatRemoved(a, T))/this.returnTotalFCp(s);
     }
 
     //clone

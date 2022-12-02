@@ -1,6 +1,5 @@
 package chemistry;
 
-import java.util.Map;
 //todo: should i extend power rate law instead of rate law
 
 public class ReversibleRateLaw extends RateLaw {
@@ -84,12 +83,13 @@ public class ReversibleRateLaw extends RateLaw {
     }
 
     //calculate rate of reaction, returns rate without accounting if it is a consumption or formation rate
-    public double returnRate(double T, double[] concentrations) {
+    public double returnRate(MultiComponentMixture mix) {
+        //TOOD: error handling null mix
 
         //only need to check on one of the order array since they have the same length
-        if (this.forwardOrders.length != concentrations.length) throw new IllegalArgumentException("array legnth mismatch between orders and concentrations");
-
-        double k = super.getK().returnRateConstant(T);
+        if (this.forwardOrders.length != mix.returnNumberOfSpecies()) throw new IllegalArgumentException("mismatch between orders and number of spsecies");
+        double[] concentrations = mix.returnAllMolConcentrations();
+        double k = super.getK().returnRateConstant(mix.getT());
         double forwardRate = k;
         double backwardRate = k/this.Keq;
 

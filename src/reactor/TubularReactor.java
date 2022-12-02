@@ -11,13 +11,14 @@ public abstract class TubularReactor extends Reactor {
     NominalPipeSizes pipeSize; //pipe size of the reactor
 
     //global variables
-    private Phase phase;
-    private ReactionSet reactions; //TODO: not sure about having any of these in the reactor class
+    private Phase g_phase;
+    private ReactionSet g_reactions; //TODO: not sure about having any of these in the reactor class
 
-    private Specie[] speciesInReactor;
-    private Stream inputStream;
-    private int tIndex; //index of temperature associated position in array
-    private int pIndex; //index of pressure associated position in array
+    private Specie[] g_speciesInReactor;
+    private Stream g_inputStream;
+    private int g_tIndex; //index of temperature associated position in array
+    private int g_pIndex; //index of pressure associated position in array
+    private double g_a; //heat transfer area per unit volume
 
     //main constructor
     public TubularReactor(double size, PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize) {
@@ -35,24 +36,26 @@ public abstract class TubularReactor extends Reactor {
 
     //global variables handlers
     protected void setGlobalVariables(ReactionSet rxns, Stream input) {
-        this.phase = input.returnPhase();
-        this.reactions = rxns.clone();
+        this.g_phase = input.returnPhase();
+        this.g_reactions = rxns.clone();
         MultiComponentMixture temp = input.clone();
         temp.addAllSpecies(rxns.returnSpecies());
-        this.speciesInReactor = temp.getSpecies();
-        this.inputStream = input.clone();
-        this.pIndex = this.speciesInReactor.length;
-        this.tIndex = this.speciesInReactor.length+1;
+        this.g_speciesInReactor = temp.getSpecies();
+        this.g_inputStream = input.clone();
+        this.g_pIndex = this.g_speciesInReactor.length;
+        this.g_tIndex = this.g_speciesInReactor.length+1;
+        this.g_a = this.returnA();
 
     }
 
     protected void resetGlobalVariables() {
-        this.phase = null;
-        this.reactions = null;
-        this.speciesInReactor = null;
-        this.inputStream = null;
-        this.tIndex = 0;
-        this.pIndex = 0;
+        this.g_phase = null;
+        this.g_reactions = null;
+        this.g_speciesInReactor = null;
+        this.g_inputStream = null;
+        this.g_tIndex = 0;
+        this.g_pIndex = 0;
+        this.g_a = 0;
     }
 
     //accessors
@@ -68,7 +71,7 @@ public abstract class TubularReactor extends Reactor {
         return this.returnReactorOutputAtPoint(this.getSize(), (Stream)input, rxn, delX, maxIt);
     }
 
-    //point is either weight or volume depending if its a PFR of a PBR
+    //point is either weight or volume depending if its g_a PFR of g_a PBR
     public Stream returnReactorOutputAtPoint(double point, Stream input, ReactionSet rxn,
                                              double delX, int maxIt){
 
@@ -89,19 +92,19 @@ public abstract class TubularReactor extends Reactor {
         setGlobalVariables(rxn, (Stream)input);
 
         //get total y array length; length = species + T + P
-        int n = this.speciesInReactor.length + 2;
+        int n = this.g_speciesInReactor.length + 2;
 
         double[] y_f = new double[n];
         double[] y_0 = new double[n];
 
         //get initial T & P
-        y_0[tIndex] = input.getT();
-        y_0[pIndex] = input.getP();
+        y_0[g_tIndex] = input.getT();
+        y_0[g_pIndex] = input.getP();
 
 //      //get inlet FlowRates
-        for (int i = 0; i < this.speciesInReactor.length; i++) {
-            if (input.hasSpecie(this.speciesInReactor[i])){
-                y_0[i] = input.returnSpecieFlowRate(this.speciesInReactor[i]);
+        for (int i = 0; i < this.g_speciesInReactor.length; i++) {
+            if (input.hasSpecie(this.g_speciesInReactor[i])){
+                y_0[i] = input.returnSpecieFlowRate(this.g_speciesInReactor[i]);
             } else {
                 // set flow rate of species which are not present in the input stream to 0
                 y_0[i] = 0;
@@ -120,14 +123,13 @@ public abstract class TubularReactor extends Reactor {
     protected double returnPDrop(Stream s) {
         return super.getpDrop().calculateValue(s); //TODO: change this to pressure drop equation
     }
-    protected double returnHeatX() {
-        return 0.; //TODO: change this to heat transfer equation
+    protected double returnHeatX(Stream s) {
+        return super.getHeatX().calculateValue(this.g_a, s, this.g_reactions);
     }
 
-    public double returnA(){
-        return 4/pipeSize.returnInnerDiameter();
-    }
-    //takes numerical methods output and converts it to a stream
+    public abstract double returnA();
+
+    //takes numerical methods output and converts it to g_a stream
     protected Stream getStreamFromY(double[] y) {
         //TODO: error handling
         if (y == null) {}
@@ -142,11 +144,11 @@ public abstract class TubularReactor extends Reactor {
         }
 
         //get T and P
-        T = y[this.tIndex];
-        P = y[this.pIndex];
+        T = y[this.g_tIndex];
+        P = y[this.g_pIndex];
 
         //viscocity stays constant in our case
-        viscocity = inputStream.getViscosity();
+        viscocity = g_inputStream.getViscosity();
 
         //put flow rates in an array
         double[] flowRates = new double[tempY.length-2];
@@ -154,14 +156,14 @@ public abstract class TubularReactor extends Reactor {
         for (int i = 0; i < flowRates.length; i++) { flowRates[i] = y[i]; }
 
         Stream result = null;
-        if (this.phase == Phase.IDEALGAS) {
+        if (this.g_phase == Phase.IDEALGAS) {
             //gas is compressible
-            result = StreamBuilder.buildGasStreamFromMolFlows(this.speciesInReactor, flowRates, T, P, viscocity);
+            result = StreamBuilder.buildGasStreamFromMolFlows(this.g_speciesInReactor, flowRates, T, P, viscocity);
         }
-        else if (this.phase == Phase.LIQUID) {
+        else if (this.g_phase == Phase.LIQUID) {
             //assume constant density => constant flow rate
-            double volFlow = inputStream.getVolFlowRate();
-            result = StreamBuilder.buildStreamFromMolFlows(this.speciesInReactor, flowRates, T, P, viscocity, volFlow);}
+            double volFlow = g_inputStream.getVolFlowRate();
+            result = StreamBuilder.buildStreamFromMolFlows(this.g_speciesInReactor, flowRates, T, P, viscocity, volFlow);}
         else {
             //TODO: throw error
         }
@@ -173,10 +175,10 @@ public abstract class TubularReactor extends Reactor {
     public double[] calculateValue(double x, double[] y0){
         Stream currentOutput = this.getStreamFromY(y0);
         double[] dely = new double[y0.length];
-        dely[this.tIndex] = returnHeatX();
-        dely[this.pIndex] = returnPDrop(currentOutput);
-        double[] rates = this.reactions.returnNetRxnRates(y0[this.tIndex], currentOutput);
-        for (int i = 0; i < this.speciesInReactor.length; i++) {
+        dely[this.g_tIndex] = returnHeatX(currentOutput);
+        dely[this.g_pIndex] = returnPDrop(currentOutput);
+        double[] rates = this.g_reactions.returnNetRxnRates(currentOutput);
+        for (int i = 0; i < this.g_speciesInReactor.length; i++) {
             dely[i] = rates[i];
         }
 
@@ -199,7 +201,6 @@ public abstract class TubularReactor extends Reactor {
         return (inFlow-outFlow)/inFlow;
 
     };
-
 
     //clone
     public abstract TubularReactor clone();

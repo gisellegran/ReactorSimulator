@@ -2,7 +2,6 @@ package reactor;
 
 import chemistry.*;
 import numericalmethods.Euler;
-import numericalmethods.SetOfODEs;
 import reactor.heat_transfer.HeatTransferEquation;
 import reactor.pressure_drop.PressureDropEquation;
 
@@ -151,7 +150,7 @@ public class PBRDesigner extends TubularReactorDesigner {
         double[] dely = new double[y0.length];
         dely[this.tIndex] = returnHeatX();
         dely[this.pIndex] = returnPDrop();
-        double[] rates = this.rxns.returnNetRxnRates(y0[this.tIndex], currentOutput);
+        double[] rates = this.rxns.returnNetRxnRates(currentOutput);
         for (int i = 0; i < this.speciesInReactor.length; i++) {
             dely[i] = rates[i];
         }

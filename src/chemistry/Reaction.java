@@ -1,7 +1,5 @@
 package chemistry;
 
-import java.util.Map;
-
 import static chemistry.RateConstant.R;
 
 public class Reaction {
@@ -149,10 +147,11 @@ public class Reaction {
 
     //to return net reaction rates for each species in a given mixture
     //TODO check if T gets updated in the mixture
-    public double[] calcAllReactionRates(double T, MultiComponentMixture mix) {
+    public double[] calcAllReactionRates(MultiComponentMixture mix) {
         if (mix == null) {
             //TODO: error handling
         }
+
 
         //TODO; if mix has species not in reaction
 
@@ -174,7 +173,7 @@ public class Reaction {
             }
         } else conc = mix.returnAllMolConcentrations();
 
-        normalizedRefRate = this.refReactionRate.returnRate(T, conc)/refV;
+        normalizedRefRate = this.refReactionRate.returnRate(mix)/refV;
 
         double[] reactionRates = new double[this.species.length];
 
@@ -185,8 +184,8 @@ public class Reaction {
         return reactionRates;
     }
 
-    public double calcRefReactionRate(double T, MultiComponentMixture mix){
-        return this.refReactionRate.returnRate(T, mix.returnAllMolConcentrations());
+    public double calcRefReactionRate(MultiComponentMixture mix){
+        return this.refReactionRate.returnRate(mix);
     }
 
 

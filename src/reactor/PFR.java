@@ -21,6 +21,7 @@ public class PFR extends TubularReactor {
     //accessors
     //mutators
     //class methods
+    public double returnA(){ return 4/pipeSize.returnInnerDiameter();}
 
     //clone
     public PFR clone() {

@@ -49,7 +49,7 @@ public abstract class RateLaw {
         return true;
     }
 
-    public abstract double returnRate(double T, double[] concentrations);
+    public abstract double returnRate(MultiComponentMixture mix);
 
     //clone
     public abstract RateLaw clone();

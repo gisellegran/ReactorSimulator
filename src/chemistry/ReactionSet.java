@@ -1,6 +1,5 @@
 package chemistry;
 import java.util.HashSet;
-import java.util.Map;
 
 public class ReactionSet {
     private Reaction[] reactions;
@@ -82,13 +81,15 @@ public class ReactionSet {
 
     }
 
-    public double[] returnNetRxnRates(double T, MultiComponentMixture mix) {
+    public double[] returnNetRxnRates(MultiComponentMixture mix) {
         int n = this.returnNumberOfSpecies();//number of species in all the reactions
         double[] netReactionRates = new double[n];
 
+        double T = mix.getT();
+
         //iterate through the reactions
         for (int i = 0; i < this.reactions.length; i++) {
-            double[] rxnRates = this.reactions[i].calcAllReactionRates(T, mix);
+            double[] rxnRates = this.reactions[i].calcAllReactionRates(mix);
 
             //iterate through the elements of the reaction
             for (int j = 0; j < n; j++) {
@@ -98,17 +99,6 @@ public class ReactionSet {
         }
          return netReactionRates;
 
-    }
-
-    //netDeltaH = sum(rij*DeltaH_ij)
-    public double returnNetDeltaH(double T, MultiComponentMixture mix){
-        double deltaH = 0.;
-
-        for (int i = 0; i < this.reactions.length; i++) {
-            deltaH += this.reactions[i].returnReactionEnthalpy(T)*this.reactions[i].calcRefReactionRate(T, mix);
-        }
-
-        return deltaH;
     }
 
     //clone

@@ -1,7 +1,5 @@
 package chemistry;
 
-import java.util.Map;
-
 //TODO: maybe make elementary rate law class
 public class PowerRateLaw extends RateLaw {
     private double[] orders;
@@ -48,9 +46,11 @@ public class PowerRateLaw extends RateLaw {
     }
 
     //calculate rate of reaction, returns rate without accounting if it is a consumption or formation rate
-    public double returnRate(double T, double[] concentrations) {
-        if (this.orders.length != concentrations.length) throw new IllegalArgumentException("array legnth mismatch between orders and concentrations");
+    public double returnRate(MultiComponentMixture mix) {
 
+        if (this.orders.length != mix.returnNumberOfSpecies()) throw new IllegalArgumentException("mismatch between number of species and number of orders");
+        double[] concentrations = mix.returnAllMolConcentrations();
+        double T = mix.getT();
         double rate = super.getK().returnRateConstant(T);
 
         for (int i = 0; i < this.orders.length; i++) {

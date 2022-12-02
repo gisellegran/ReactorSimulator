@@ -1,5 +1,6 @@
 package reactor.heat_transfer;
 
+import chemistry.ReactionSet;
 import reactor.NominalPipeSizes;
 import reactor.Stream;
 
@@ -17,7 +18,7 @@ public class Isothermal extends HeatTransferEquation{
 
     //rhs of the heat transfer equation
     @Override
-    public double calculateValue(double a, Stream s, double T, double rdelH) {
+    public double calculateValue(double a, Stream s, ReactionSet rxnSet) {
         return 0.;
     }
 
