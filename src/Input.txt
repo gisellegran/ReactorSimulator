@@ -1,0 +1,37 @@
+####Species
+    for each species: (or just the name & phase if were limitting to the listed ones)
+    name, phase, molarMass, HeatCapacotyCoeffs,
+
+####Reaction (For powerrate law)
+    rate type (POWERLAW,..)
+    rate constant A/Ea
+    Reference enthalpy (kJ/mol...)/ reference temperature (K or C)
+    for each species:
+    Species name, stpichiometric coefficient, order
+    --- - repeat for each reaction
+
+###Stream Input
+T(K or C)
+P(atm or kPa ...)
+Viscosity
+Stream Composition (molar flows or totalMolarFlow + molFractions)
+
+###Reactor
+    Type (PBR of PFR)
+    Pressure Drop (ISOBARIC or ERGUN)
+        if ergun, catalyst details must be given
+    Heat Transfer (ISOTHERMAL, ADIABATIC, COCURRENT, COUNTERCURRENT)
+    if PBR:
+        Volume (L or m3 or..)
+    if PFR:
+        Weight (kg, g or..)
+
+
+##Catalyst
+    density (what units)
+    ....
+
+
+
+
+

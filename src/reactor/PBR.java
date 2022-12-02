@@ -1,0 +1,37 @@
+package reactor;
+
+import reactor.heat_transfer.HeatTransferEquation;
+import reactor.pressure_drop.PressureDropEquation;
+
+public class PBR extends TubularReactor {
+
+    //instance variables
+    private Catalyst catalyst;
+
+    //main constructor
+    public PBR(double weight, PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize) {
+        super(weight, pDrop, heatX, pipeSize);
+    }
+
+    //copy constructor
+    public PBR(PBR source){
+        super(source);
+    }
+    //accessors
+    //mutators
+    //class methods
+    //todo: implement
+
+    public double returnA(){
+        return (4/this.pipeSize.returnInnerDiameter())/this.catalyst.returnBulkDensity();
+    }
+
+    //clone
+    public PBR clone() {
+        return new PBR(this);
+    }
+
+    //equals
+    //TODO: implement
+
+}
