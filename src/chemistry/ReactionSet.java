@@ -71,7 +71,7 @@ public class ReactionSet {
         //TODO: use something other than set if its not allowed
 
         for (int i = 0; i < this.reactions.length; i++) {
-            Specie[] species = this.reactions[i].returnAllSpecies();
+            Specie[] species = this.reactions[i].getSpecies();
             for(int j = 0; j < species.length; j++){
                 specieSet.add(species[j].clone());
             }

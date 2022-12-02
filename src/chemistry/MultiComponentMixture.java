@@ -126,8 +126,8 @@ public abstract class MultiComponentMixture {
 
     public double[] getMolComposition() {
         //FIXME: adapt for the composition map
-        double[] temp = new double[molComposition.length];
-        for (int i = 0; i < species.length; i++) {
+        double[] temp = new double[this.molComposition.length];
+        for (int i = 0; i < this.species.length; i++) {
             temp[i] = this.molComposition[i];
         }
         return temp;

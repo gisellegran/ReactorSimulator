@@ -6,21 +6,37 @@ import static chemistry.RateConstant.R;
 
 public class Reaction {
     private RateLaw refReactionRate;
-    private StoichiometryMap rxnStoichiometry;
+    private Specie[] species;
+    private double[] stoichiometry;
+
     private RefValue refEnthalpy;
 
-    private Specie refSpecie;
+    //globabl variables
+    int g_refI; // reference species index
 
     //constructor
-    public Reaction (RateLaw refReactionRate, StoichiometryMap rxnStoichiometry, RefValue refEnthalpy)
+    public Reaction (RateLaw refReactionRate, Specie[] species, double[] stoichiometry, RefValue refEnthalpy)
     {
+        //TODO; error handling
         if(refReactionRate==null) System.exit(0);
-        if(rxnStoichiometry==null) System.exit(0);
+        if(stoichiometry==null) System.exit(0);
         if(refEnthalpy==null) System.exit(0);
+
+        //TODO; throw error if ref species is not in the species list
+
+        if (species.length != stoichiometry.length) {throw new IllegalArgumentException("array length mismatch")}
+        for (int i = 0; i < species.length; i++) {
+            if (species[i] == null ) {throw new IllegalArgumentException("null element in array");}
+        }
+        this.species = new Specie[species.length];
+        this.stoichiometry = new double[stoichiometry.length];
+
+        //do species and stoichionmetry at the same time since theyre the same legnth
+        for (int i = 0; i < stoichiometry.length; i++) {
+            this.species[i] = species[i];
+            this.stoichiometry[i] = stoichiometry[i];
+        }
         this.refReactionRate = refReactionRate.clone();
-        this.rxnStoichiometry = rxnStoichiometry.clone();
-
-
         this.refEnthalpy = refEnthalpy.clone();
     }
 
@@ -30,9 +46,19 @@ public class Reaction {
         if(source==null) System.exit(0);
         this.refReactionRate = source.refReactionRate.clone();
 
-        this.rxnStoichiometry = source.rxnStoichiometry.clone();
+        this.stoichiometry = source.stoichiometry.clone();
 
         this.refEnthalpy = source.refEnthalpy.clone();
+    }
+
+    //global variable handlers
+    private void setGlobalVariables(){
+
+        //set refSpecie index in the specie array
+        for (int i = 0; i < this.species.length; i++) {
+            if(this.species[i].equals(this.refReactionRate.getRefSpecie())) {this.g_refI = i;}
+            break;
+        }
     }
 
     //accessors
@@ -41,8 +67,12 @@ public class Reaction {
         return this.refReactionRate.clone();
     }
 
-    public StoichiometryMap getRxnStoichiometry() {
-        return this.rxnStoichiometry.clone();
+    public double[] getRxnStoichiometry() {
+        double[] temp = new double[this.stoichiometry.length];
+        for (int i = 0; i < this.stoichiometry.length; i++) {
+            temp[i] = this.stoichiometry[i];
+        }
+        return temp;
     }
 
     public RefValue getRefEnthalpy()
@@ -50,6 +80,9 @@ public class Reaction {
         return this.refEnthalpy.clone();
     }
 
+    public Specie[] setSpecies(){
+        // todo: implement
+    }
     //mutators
     public boolean setRefReactionRate(RateLaw refReactionRate) {
         if (refReactionRate == null) return false;
@@ -57,9 +90,15 @@ public class Reaction {
         return true;
     }
 
-    public boolean setRxnStoichiometry(StoichiometryMap rxnStoichiometry) {
-        if(rxnStoichiometry==null) return false;
-        this.rxnStoichiometry = rxnStoichiometry.clone();
+    public boolean setStoichiometry(double[] stoichiometry) {
+        //todo: throw error?
+        if(stoichiometry==null) return false;
+
+        if (stoichiometry.length != this.stoichiometry.length){return false;}
+        for (int i = 0; i < this.stoichiometry.length; i++) {
+            this.stoichiometry[i] = stoichiometry[i];
+        }
+
         return true;
     }
 
@@ -70,52 +109,61 @@ public class Reaction {
     }
 
     public int returnNumberOfSpecies() {
-        return rxnStoichiometry.size();
+        return species.length;
     }
 
-    public Specie[] returnAllSpecies(){
-        return this.rxnStoichiometry.returnAllSpecies();
+    public Specie[] getSpecies(){
+        Specie[] temp = new Specie[this.species.length];
+        for (int i = 0; i < this.species.length; i++) {
+            temp[i] = this.species[i];
+        }
+        return temp;
     }
 
-    public double returnSpecieStoichCoeff(Specie s) { return this.rxnStoichiometry.returnSpecieStoichCoeff(s);}
+    public double returnSpecieStoichCoeff(Specie s) { return this.stoichiometry.returnSpecieStoichCoeff(s);}
     public boolean hasSpecie(Specie s){
-        return rxnStoichiometry.hasSpecie(s);
+        if (s == null) {throw new IllegalArgumentException("specie is null");}
+        for (int i = 0; i < this.species.length; i++) {
+            if (species[i].equals(s)){
+                return true;
+            }
+        }
+        return false;
     }
 
     //to return net reaction rates for each species in a given mixture
-    public SpecieMap calcAllReactionRates(double T, MultiComponentMixture mix) {
+    //TODO check if T gets updated in the mixture
+    public double[] calcAllReactionRates(double T, MultiComponentMixture mix) {
         if (mix == null) {
             //TODO: error handling
         }
 
+        //TODO; if mix has species not in reaction
+
+        double[] conc; //values to be passed to reaction rate for calculation
+        //concentration for liquid andpartial pressure for gas
+
         //absolute value of the reference species stoichiometric coefficient, for normalizing the reaction rate
-        double refV = Math.abs(this.rxnStoichiometry.returnSpecieStoichCoeff(this.refReactionRate.getRefSpecie()));
+        double refV = Math.abs(this.stoichiometry[g_refI]);
 
         double normalizedRefRate;
         if (mix.returnPhase() == Phase.IDEALGAS) {
-            SpecieMap concentrations= mix.returnAllMolConcentrations();
-            SpecieMap partialPs = new SpecieMap();
+            double[] concentrations = mix.returnAllMolConcentrations();
+            conc = new double[this.species.length];
 
-            concentrations.forEach((specie, v)
-                    -> partialPs.put(specie.clone(), v*R*mix.getT()));
+            double mixT = mix.getT();
 
-            normalizedRefRate = this.refReactionRate.returnRate(T, partialPs)/refV;
-        } else {
-            normalizedRefRate = this.refReactionRate.returnRate(T, mix.returnAllMolConcentrations())/refV;
-        }
-
-
-        SpecieMap reactionRates = new SpecieMap();
-
-        Specie[] species = mix.getSpecies();
-
-        for (int i = 0; i < species.length; i++) {
-            if (this.rxnStoichiometry.hasSpecie(species[i])){
-                reactionRates.put(species[i].clone(), normalizedRefRate*this.rxnStoichiometry.returnSpecieStoichCoeff(species[i]));
-            } else {
-                reactionRates.put(species[i].clone(), 0.);
+            for (int i = 0; i < concentrations.length; i++) {
+                conc[i] = concentrations[i] * R * mixT;
             }
+        } else conc = mix.returnAllMolConcentrations();
 
+        normalizedRefRate = this.refReactionRate.returnRate(T, conc)/refV;
+
+        double[] reactionRates = new double[this.species.length];
+
+        for (int i = 0; i < this.species.length; i++) {
+                reactionRates[i] = normalizedRefRate*this.stoichiometry[i];
         }
 
         return reactionRates;
@@ -130,10 +178,10 @@ public class Reaction {
     private double returnDeltaC(double T){
         double deltaC = 0.;
         //get the absolute value of the reference specie in order to obtain the normalized & generalized stoichiometric coefficients
-        double absRefStoich = Math.abs(this.rxnStoichiometry.get(this.refReactionRate.getRefSpecie())); //stoichiometric coefficient of the refference specie of the reaction
+        double absRefStoich = Math.abs(this.stoichiometry.get(this.refReactionRate.getRefSpecie())); //stoichiometric coefficient of the refference specie of the reaction
 
         //iterate through the map to calculate the
-        for (Map.Entry<Specie, Double> entry : this.rxnStoichiometry.entrySet()) {
+        for (Map.Entry<Specie, Double> entry : this.stoichiometry.entrySet()) {
             double Ci = entry.getKey().returnHeatCapacity(T); //species i heat capacity at T
             double stoichCoeff = entry.getValue(); //stoichiometric coefficient of species i
             deltaC += (stoichCoeff/absRefStoich)*Ci; // add Cp_i * v_i/|v_ref|
@@ -162,7 +210,7 @@ public class Reaction {
 
         boolean isEquals = true;
         if(this.refReactionRate.equals(((Reaction) comparator).refReactionRate) == false) isEquals = false;
-        if(this.rxnStoichiometry.equals(((Reaction) comparator).rxnStoichiometry) == false) isEquals = false;
+        if(this.stoichiometry.equals(((Reaction) comparator).stoichiometry) == false) isEquals = false;
         if(this.refEnthalpy.equals(((Reaction) comparator).refEnthalpy) == false) isEquals = false;
         return isEquals;
     }
