@@ -1,7 +1,5 @@
 package chemistry;
 
-import java.util.Map;
-
 //FIXME make into abstract class
 public abstract class MultiComponentMixture {
 
@@ -126,7 +124,7 @@ public abstract class MultiComponentMixture {
 
     //accessors
 
-    public double[] getComposition() {
+    public double[] getMolComposition() {
         //FIXME: adapt for the composition map
         double[] temp = new double[molComposition.length];
         for (int i = 0; i < species.length; i++) {
@@ -264,7 +262,7 @@ public abstract class MultiComponentMixture {
 
     public abstract double returnSpecieMolConcentration(Specie s);
 
-    public abstract SpecieMap returnAllMolConcentrations();
+    public abstract double[] returnAllMolConcentrations();
 
     //clone
     public abstract MultiComponentMixture clone();

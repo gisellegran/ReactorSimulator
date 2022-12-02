@@ -211,7 +211,7 @@ public class Driver {
                 }
 
                 //TODO: add stream builder for the gerenal case of having just composition map or just the arrays directly + classifier (composition or molar fllow)
-                inletStream = new Stream(new CompositionMap(allSpecies, composition), T, P, viscosity, inletVolFlowrate, totalFlow);
+                inletStream = new Stream(, new CompositionMap(allSpecies, composition), , T, P, viscosity, inletVolFlowrate, totalFlow);
                 break;
 
             case 2:

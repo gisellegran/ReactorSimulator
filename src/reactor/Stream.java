@@ -13,10 +13,10 @@ public class Stream extends MultiComponentMixture{
 
 
     //main constructor
-    public Stream(CompositionMap composition, double T, double P,
+    public Stream(Specie[] species, double[] molComposition, double T, double P,
                   double viscocity, double volFlowRate, double molarFlowRate ){
         //TODO do we want to take phase as an input? im not sure
-        super(, composition, , viscocity, T, P);
+        super(species, molComposition, viscocity, T, P);
         this.volFlowRate = volFlowRate;
         this.molarFlowRate = molarFlowRate;
 
@@ -83,7 +83,7 @@ public class Stream extends MultiComponentMixture{
 
     //TODO: some code to explain in the report
     public double returnTotalConcentration(){
-        return getAllFlowRates().values().stream().reduce(0., (a, b) -> a + b);
+        return this.molarFlowRate/this.volFlowRate;
     }
 
     public double returnSpecieMolConcentration(Specie s){
@@ -93,13 +93,16 @@ public class Stream extends MultiComponentMixture{
     }
 
 
-    public SpecieMap returnAllMolConcentrations(){
-        SpecieMap concentrations = new SpecieMap(this.returnNumberOfSpecies());
-        this.getComposition().forEach((specie, v) ->
-                concentrations.put(specie, returnSpecieFlowRate(specie)/this.volFlowRate));
+    public double[] returnAllMolConcentrations(){
+
+        double[] concentrations = this.getMolComposition();
+        for (int i = 0; i < concentrations.length; i++) {
+            concentrations[i] = concentrations[i]*this.returnTotalConcentration();
+        }
         return concentrations;
     };
 
+    //todo: probably remove if not needed
     public boolean setSpecieFlowRate(Specie s, double flowRate){
 
         if (s == null) {
@@ -118,7 +121,7 @@ public class Stream extends MultiComponentMixture{
             this.volFlowRate = this.volFlowRate*FT/FT0;
         }
 
-        super.setComposition(new CompositionMap(map));
+        //super.setComposition(new CompositionMap(map));
         this.molarFlowRate = FT;
 
         return true;
