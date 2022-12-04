@@ -58,18 +58,6 @@ public class ReactionSet {
         return false;
     }
 
-    public Phase getPhase(){
-        if (this.isSinglePhase()) return reactions[0].getPhase();
-        return Phase.L_G;
-    }
-
-    public boolean isSinglePhase(){
-        Phase phase = reactions[0].getPhase();
-        for (int i = 1; i < this.reactions.length; i++) {
-            if (reactions[i].getPhase() != phase) return false;
-        }
-        return true;
-    }
     public int returnNumberOfSpecies() {
         //TODO: not ideal should change (along with returnSpecies
         return this.returnSpecies().length;

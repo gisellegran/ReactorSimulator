@@ -17,7 +17,7 @@ public class Catalyst {
     //copy constructor
     public Catalyst(Catalyst source)
     {
-        if(source==null) System.exit(0);
+        if(source==null) {throw new IllegalArgumentException("source is null");}
         this.particleDiameter = source.particleDiameter;
         this.voidFraction = source.voidFraction;
         this.particleDensity = source.particleDensity;

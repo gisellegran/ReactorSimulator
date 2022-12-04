@@ -1,7 +1,7 @@
 package reactor.heat_transfer;
 
 public enum HeatTransferCondition {
-    ISOTHERMAL, ADIABATIC, FREE_CONVECTIVE, COCURRENT, COUNTERCURRENT;
+    ISOTHERMAL, ADIABATIC, COCURRENT, COUNTERCURRENT;
 
     public static HeatTransferCondition findByName(String id) {
         HeatTransferCondition result = null; //TODO: error handling?

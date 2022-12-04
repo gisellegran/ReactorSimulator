@@ -39,7 +39,6 @@ public enum Element {
         this.heatCapacityCoefficients[4] = heatCapacityCoefficients[4]*1E-12;
     }
 
-    //return the right Element based on the string
     public static Element findByName(String id) {
         Element result = null; //TODO: error handling?
         for (Element elem : values()) {

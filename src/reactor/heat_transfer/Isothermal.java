@@ -1,14 +1,12 @@
 package reactor.heat_transfer;
 
 import chemistry.ReactionSet;
+import reactor.NominalPipeSizes;
 import reactor.Stream;
 
 public class Isothermal extends HeatTransferEquation{
-
-    private static HeatTransferCondition condition = HeatTransferCondition.ISOTHERMAL;
-    //default pipe size if one inch
-    public Isothermal(){
-        super(0., 0.);
+    public Isothermal(double U, double Ta0, NominalPipeSizes pipeSize){
+        super(U, Ta0, pipeSize);
     }
     public Isothermal(Isothermal source){
         super(source);
@@ -20,7 +18,7 @@ public class Isothermal extends HeatTransferEquation{
 
     //rhs of the heat transfer equation
     @Override
-    public double calculateDelT(double a, Stream s, ReactionSet rxnSet) {
+    public double calculateValue(double a, Stream s, ReactionSet rxnSet) {
         return 0.;
     }
 

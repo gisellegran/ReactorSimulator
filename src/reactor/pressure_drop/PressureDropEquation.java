@@ -14,8 +14,8 @@ public abstract class PressureDropEquation{
     //copy constructor
     public PressureDropEquation(PressureDropEquation source)
     {
-        //TODO: error handling
-        if(source==null) System.exit(0);
+
+        if(source==null) throw new IllegalArgumentException("source is null");
     }
 
 

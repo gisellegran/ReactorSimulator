@@ -9,8 +9,7 @@ public class Isobaric extends PressureDropEquation{
 
     //copy constructor
     public Isobaric(Isobaric source) {
-        //TODO: error handling
-        if(source==null) System.exit(0);
+        if(source==null) throw new IllegalArgumentException("source is null");;
     }
 
     public double calculateValue(MultiComponentMixture s) {
@@ -20,7 +19,7 @@ public class Isobaric extends PressureDropEquation{
     //clone
     public Isobaric clone(){
         return new Isobaric(this);
-    };
+    }
 
     //equals
     public boolean equals(Object comparator) {

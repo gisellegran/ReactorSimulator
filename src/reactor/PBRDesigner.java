@@ -132,13 +132,11 @@ public class PBRDesigner extends TubularReactorDesigner {
         } while (yf[targetIndex] < targetF && iterationCount<maxIt && xf<100000);
 
         if (xf>100000){
-            //TODO: throw error
-            System.out.println("input does not converge");
-            System.exit(0);
+            throw new IllegalArgumentException("input does not converge");
         }
 
         NominalPipeSizes pipeSize = NominalPipeSizes.ONE_INCH;
-        PBR result = new PBR(xf, pDrop, heatX, pipeSize, null);
+        PBR result = new PBR(xf, pDrop, heatX, pipeSize);
         resetGlobalVariables();
 
         //generate stream
@@ -171,4 +169,6 @@ public class PBRDesigner extends TubularReactorDesigner {
         T0 = input.getT();
         return v0*(FT/FT0)*(P0/P)*(T/T0);
     }
+
+
 }

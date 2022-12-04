@@ -16,7 +16,7 @@ public class Stream extends MultiComponentMixture{
     public Stream(Specie[] species, double[] molComposition, double T, double P,
                   double viscocity, double volFlowRate, double molarFlowRate ){
         //TODO do we want to take phase as an input? im not sure
-        super(species, molComposition, T, P, viscocity);
+        super(species, molComposition, viscocity, T, P);
         this.volFlowRate = volFlowRate;
         this.molarFlowRate = molarFlowRate;
 
@@ -64,8 +64,8 @@ public class Stream extends MultiComponentMixture{
 
     //class methods
     public double returnSpecieFlowRate(Specie s){
-        //TODO: null pointer exception
-        if (s == null) {System.exit(0);}
+
+        if (s == null) throw new IllegalArgumentException("specie parameter is null");
         //TODO: check if this is adequate or if an error should be thrown
         if (!this.hasSpecie(s)) return -1.0;
 
@@ -87,8 +87,8 @@ public class Stream extends MultiComponentMixture{
     }
 
     public double returnSpecieMolConcentration(Specie s){
-        if (s == null) ;//TODO: throw error
-        if (!this.hasSpecie(s)) ; //TODO: throw error
+        if (s == null) throw new IllegalArgumentException("specie parameter is null");
+        if (!this.hasSpecie(s)) throw new IllegalArgumentException("catalyst parameter is null");
         return this.returnSpecieFlowRate(s)/this.volFlowRate;
     }
 

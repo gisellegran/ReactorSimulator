@@ -8,7 +8,8 @@ public class StreamBuilder {
 
     public static  Stream buildStreamFromMolFlows(Specie[] species, double[] molFlows, double T, double P,
                                                   double viscocity, double volFlowRate) {
-        //TODO: check for null molFlows array
+
+        if (molFlows==null)throw new IllegalArgumentException("molar flow is null");
         double totalMolFlow = StreamBuilder.returnTotalMolFlow(molFlows);
 
         double[] molComposition = StreamBuilder.returnMolComposition(molFlows);
@@ -42,12 +43,6 @@ public class StreamBuilder {
         double volFlowRate = StreamBuilder.returnGasVolFLow(totalMolFlow, T, P);
         //now that we have the total vol flow rate, we can just use the buildStreamFromMolFlows method instead of repeating the same code
         return StreamBuilder.buildStreamFromMolFlows(species, molFlows, T,  P, viscocity, volFlowRate);
-    }
-
-    public static Stream buildGasStream(Specie[] species, double[] composition, double T, double P, double viscocity, double totalMolFlow) {
-        double volFlowRate = StreamBuilder.returnGasVolFLow(totalMolFlow, T, P);
-        //now that we have the total vol flow rate, we can just use the buildStreamFromMolFlows method instead of repeating the same code
-        return new Stream(species, composition, T,  P, viscocity, volFlowRate, totalMolFlow);
     }
 
     protected static double returnGasVolFLow(double FT, double T, double P) {

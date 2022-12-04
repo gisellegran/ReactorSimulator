@@ -19,8 +19,8 @@ public class ErgunPDrop extends PressureDropEquation{
     // main constructor
     public ErgunPDrop(Catalyst catalyst, NominalPipeSizes pipeSize) {
         super();
-        //TODO: error handling
-        if(catalyst==null || pipeSize == null) System.exit(0);
+
+        if(catalyst==null || pipeSize == null) throw new IllegalArgumentException("catalyst parameter is null");
         this.catalyst = catalyst.clone();
         this.pipeSize = pipeSize;
     }
@@ -28,8 +28,8 @@ public class ErgunPDrop extends PressureDropEquation{
     //copy constructor
     public ErgunPDrop(ErgunPDrop source) {
         super(source);
-        //TODO: error handling
-        if(source==null) System.exit(0);
+
+        if(source==null) throw new IllegalArgumentException("source is null");
         this.catalyst = source.catalyst.clone();
         this.pipeSize = source.pipeSize;
     }
@@ -55,7 +55,9 @@ public class ErgunPDrop extends PressureDropEquation{
         if (!super.equals(comparator)) return false;
 
         boolean isEquals = true;
-        if(this.catalyst.equals(((ErgunPDrop) comparator).catalyst) == false) isEquals = false;
+        if(!this.catalyst.equals(((ErgunPDrop) comparator).catalyst)) isEquals = false;
+        if(!this.s.equals(((ErgunPDrop) comparator).s)) isEquals = false;
+        if(!this.s0.equals(((ErgunPDrop) comparator).s0)) isEquals = false;
         return isEquals;
     }
 }
