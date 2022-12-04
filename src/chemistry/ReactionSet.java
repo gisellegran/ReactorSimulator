@@ -127,7 +127,7 @@ public class ReactionSet {
 
         boolean isEquals = true;
         for(int i=0;i<this.reactions.length;i++)
-            if( this.reactions[i].equals(((ReactionSet) comparator).reactions[i]) == false ) isEquals = false;
+            if( !this.reactions[i].equals(((ReactionSet) comparator).reactions[i])) isEquals = false;
         return isEquals;
     }
 

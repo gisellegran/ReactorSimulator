@@ -32,7 +32,8 @@ public abstract class TubularReactor extends Reactor {
     //main constructor
     public TubularReactor(double size, PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize) {
         super(size, pDrop, heatX);
-        //TODO: check if the enum is null?
+
+        if (pipeSize==null) throw new IllegalArgumentException("Pipe size of the reactor is null");
         this.pipeSize = pipeSize;
         resetGlobalVariables();
     }
@@ -73,13 +74,25 @@ public abstract class TubularReactor extends Reactor {
     }
 
     //accessors
+
+    public NominalPipeSizes getPipeSize() {
+        return this.pipeSize;
+    }
+
     //mutators
+
+    public boolean setPipeSize(NominalPipeSizes pipeSize) {
+        if (pipeSize==null) return false;
+        this.pipeSize = pipeSize;
+        return true;
+    }
+
     //class methods
 
     //TODO: maybe fix this to just take stream and remove it form the reactor class
     public Stream returnReactorOutput(MultiComponentMixture input, ReactionSet rxn, double delX, int maxIt) {
         if (input.getClass()  != Stream.class) {
-           // TODO: throw errror
+            {throw new IllegalArgumentException("Stream required as input for tubular reactors");}
         }
 
         return this.returnReactorOutputAtPoint(this.getSize(), (Stream)input, rxn, delX, maxIt);
@@ -91,15 +104,15 @@ public abstract class TubularReactor extends Reactor {
         //checks to make first
         //check for null objects
         if (input == null || rxn == null) {
-            //TODO: throw error
+            {throw new IllegalArgumentException("The reaction and input are null");}
         }
         //is point adequate
         if (point < 0 || point > super.getSize()) {
-            //TODO: throw error
+            {throw new IllegalArgumentException("Volume or Weight is negative");}
         }
 
         if (input.getClass()  != Stream.class) {
-            // TODO: throw errror
+            {throw new IllegalArgumentException("not the same class");}
         }
 
         setGlobalVariables(rxn, (Stream)input);
@@ -143,9 +156,8 @@ public abstract class TubularReactor extends Reactor {
 
     //takes numerical methods output and converts it to g_a stream
     protected Stream getStreamFromY(double[] y) {
-        //TODO: error handling
-        if (y == null) {}
 
+        if (y == null) {throw new IllegalArgumentException("y is null");}
         double T, P, viscocity;
 
         //make local deep copy of y
@@ -208,26 +220,39 @@ public abstract class TubularReactor extends Reactor {
 
     public static double returnConversion(Specie s, Stream input, Stream output){
         if (s == null || input == null || output == null) {
-            //TODO: throw error
+            {throw new IllegalArgumentException("Specie, inlet stream  or outlet stream is null");}
         }
         double inFlow = input.returnSpecieFlowRate(s);
         double outFlow = output.returnSpecieFlowRate(s);
 
         if (inFlow < 0.){
-            //TODO: throw error
+            {throw new IllegalArgumentException("inlet flow is negative");}
         } else if (inFlow<outFlow) {
-            //TODO: throw error
+            {throw new IllegalArgumentException("inlet flow is less than outlet flow");}
         }
 
         return (inFlow-outFlow)/inFlow;
 
-    };
+    }
+
 
     //clone
     public abstract TubularReactor clone();
 
+    //toString
     public String toString(){
         return super.toString()+"\nPipeSize: "+this.pipeSize;
     }
+
     //equals
+    public boolean equals(Object comparator) {
+        boolean isEquals=true;
+
+        if (comparator == null) return false;
+        else if (this.getClass() != comparator.getClass()) return false;
+        else
+        if (!(((TubularReactor)comparator).pipeSize ==(this.pipeSize)))isEquals = false;
+
+        return isEquals;
+    }
 }

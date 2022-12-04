@@ -6,9 +6,19 @@ import static chemistry.RateConstant.R;
 
 public class StreamBuilder {
 
+
     public static  Stream buildStreamFromMolFlows(Specie[] species, double[] molFlows, double T, double P,
                                                   double viscocity, double volFlowRate) {
-        //TODO: check for null molFlows array
+
+        if (species==null)throw new IllegalArgumentException("species array is null");
+        if (molFlows==null)throw new IllegalArgumentException("molar flow array is null");
+
+        if (species.length != molFlows.length) {throw new IllegalArgumentException("array length mismatch");}
+        //check for null elements
+        for (int i = 0; i < species.length; i++) {
+            if (species[i] == null ) {throw new IllegalArgumentException("null element in array");}
+        }
+
         double totalMolFlow = StreamBuilder.returnTotalMolFlow(molFlows);
 
         double[] molComposition = StreamBuilder.returnMolComposition(molFlows);
@@ -16,9 +26,18 @@ public class StreamBuilder {
         return new Stream(species, molComposition, T, P, viscocity, volFlowRate, totalMolFlow);
     }
 
-    public static  Stream buildGasStream(Specie[] species, double[] molFlows,
-                                                  double viscocity, double volFlowRate) {
-        //TODO: check for null molFlows array
+    public static Stream buildGasStream(Specie[] species, double[] molFlows, double viscocity, double volFlowRate) {
+        if (species==null)throw new IllegalArgumentException("species array is null");
+        if (molFlows==null)throw new IllegalArgumentException("molar flow array is null");
+
+        if (species.length != molFlows.length) {throw new IllegalArgumentException("array length mismatch");}
+        //check for null elements
+        for (int i = 0; i < species.length; i++) {
+            if (species[i] == null) {
+                throw new IllegalArgumentException("null element in array");
+            }
+        }
+
         double totalMolFlow = StreamBuilder.returnTotalMolFlow(molFlows);
 
         double[] molComposition = StreamBuilder.returnMolComposition(molFlows);

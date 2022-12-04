@@ -5,7 +5,7 @@ import reactor.Stream;
 
 public class Isothermal extends HeatTransferEquation{
 
-    private static HeatTransferCondition condition = HeatTransferCondition.ISOTHERMAL;
+    private static final HeatTransferCondition condition = HeatTransferCondition.ISOTHERMAL;
     //default pipe size if one inch
     public Isothermal(){
         super(0., 0.);
@@ -18,9 +18,7 @@ public class Isothermal extends HeatTransferEquation{
         return new Isothermal(this);
     }
 
-    public HeatTransferCondition getHeatTransferCondition(){
-        return this.condition;
-    };
+    public HeatTransferCondition getHeatTransferCondition(){return this.condition;}
 
     //rhs of the heat transfer equation
     @Override

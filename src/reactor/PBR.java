@@ -21,10 +21,20 @@ public class PBR extends TubularReactor {
         this.catalyst = source.catalyst.clone();
     }
     //accessors
-    //mutators
-    //class methods
-    //todo: implement
 
+    public Catalyst getCatalyst() {
+        return this.catalyst.clone();
+    }
+
+    //mutators
+
+    public boolean setCatalyst(Catalyst catalyst) {
+        if (catalyst==null) return false;
+        this.catalyst = catalyst.clone();
+        return true;
+    }
+
+    //class methods
     public double returnA(){
         return (4/this.pipeSize.returnInnerDiameter())/this.catalyst.returnBulkDensity();
     }
@@ -42,6 +52,14 @@ public class PBR extends TubularReactor {
     }
 
     //equals
-    //TODO: implement
+    @Override
+    public boolean equals(Object comparator) {
+        if (!super.equals(comparator)) return false;
+        PBR objPBR = (PBR)comparator;
+        if (!(this.catalyst.equals(objPBR.catalyst))) return false;
+    return true;
+    }
+
+
 
 }

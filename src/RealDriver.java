@@ -446,8 +446,8 @@ public class RealDriver {
             }
 
             if (problem.equalsIgnoreCase("design")) {
-                String toMaximize = in.next();
-                String desiredName = in.next(); //get name of desired specie
+                String toMaximize = in.next().strip();
+                String desiredName = in.next().strip(); //get name of desired specie
                 desiredS = getSpecieFromName(desiredName, species);
                 if (toMaximize.equalsIgnoreCase("flow")) {
                     PFRDesigner designer = new PFRDesigner(reactor);
@@ -458,7 +458,7 @@ public class RealDriver {
                     PFRDesigner designer = new PFRDesigner(reactor);
                     reactor = designer.returnReactorForMaxSelectivity(desiredS, undesiredS, inlet, rxnSet, delX, maxIt);
                 } else {
-                    //todo: throw error
+                    throw new InputException("design problem type not sepcified");
                 }
             }
 
@@ -474,7 +474,7 @@ public class RealDriver {
 
         }
         finally{
-            System.out.println("no input found");
+            System.out.println("Simulation complete. Output generated.");
         }
 
 

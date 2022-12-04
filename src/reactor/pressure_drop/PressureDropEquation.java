@@ -15,8 +15,7 @@ public abstract class PressureDropEquation{
     //copy constructor
     public PressureDropEquation(PressureDropEquation source)
     {
-        //TODO: error handling
-        if(source==null) System.exit(0);
+        if(source==null) throw new IllegalArgumentException("source is null");
     }
 
 
@@ -31,8 +30,6 @@ public abstract class PressureDropEquation{
     //equals
     public boolean equals(Object comparator) {
         if(comparator == null) return false;
-        else if(this.getClass() != comparator.getClass()) return false;
-
-        return true;
+        else return this.getClass() == comparator.getClass();
     }
 }

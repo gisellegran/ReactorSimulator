@@ -1,15 +1,12 @@
 package reactor;
 
 import chemistry.*;
+import numericalmethods.Euler;
 import numericalmethods.SetOfODEs;
 import reactor.heat_transfer.HeatTransferEquation;
 import reactor.pressure_drop.PressureDropEquation;
 
 public abstract class TubularReactorDesigner implements SetOfODEs{
-
-    //instance variables
-    private PressureDropEquation pDrop;
-    private HeatTransferEquation heatX;
 
         //Global variables
         private Phase phase;
@@ -18,6 +15,9 @@ public abstract class TubularReactorDesigner implements SetOfODEs{
         private Stream input;
         private int tIndex; //index of temperature associated position in array
         private int pIndex; //index of pressure associated position in array
+
+        private HeatTransferEquation heatX;
+        private PressureDropEquation pDrop;
 
 
 
@@ -60,7 +60,8 @@ public abstract class TubularReactorDesigner implements SetOfODEs{
 
         private int getTargetIndex(Specie s) {
             int targetIndex = -1;
-            //TODO: error handling
+
+            if (s==null) throw new IllegalArgumentException("specie is null");
             for (int i = 0; i < this.speciesInReactor.length; i++) {
                 if (this.speciesInReactor[i].equals(s)) {
                     targetIndex = i;
@@ -72,7 +73,7 @@ public abstract class TubularReactorDesigner implements SetOfODEs{
 
         //TODO: fix
     /*
-        public TubularReactor returnReactorForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns,
+        public TubularReactor returnVForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns,
                                         PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize, double delX, int maxIt){
             setGlobalVariables(rxns, input, pDrop, heatX);
 
@@ -159,8 +160,8 @@ public abstract class TubularReactorDesigner implements SetOfODEs{
         }
 
         protected Stream getStreamFromY(double[] y) {
-            //TODO: error handling
-            if (y == null) {
+
+            if (y == null) { throw new IllegalArgumentException("y is null");
             }
 
             double T, P, viscocity;
@@ -196,7 +197,7 @@ public abstract class TubularReactorDesigner implements SetOfODEs{
                 double volFlow = input.getVolFlowRate();
                 result = StreamBuilder.buildStreamFromMolFlows(this.speciesInReactor, flowRates, T, P, viscocity, volFlow);
             } else {
-                //TODO: throw error
+                 throw new IllegalArgumentException("flow rate is assumed to be constant");
             }
 
             return result;
@@ -212,4 +213,42 @@ public abstract class TubularReactorDesigner implements SetOfODEs{
             return v0*(FT/FT0)*(P0/P)*(T/T0);
         }
 
-}
+        //equals
+        public boolean equals(Object obj)
+            {
+            //check for null
+
+            if (obj == null) return false;
+
+            //check that classes are equal
+            if (this.getClass() != obj.getClass()) return false;
+
+            //convert obj to reactor
+            TubularReactorDesigner objTBR = (TubularReactorDesigner) obj;
+
+            //check primitive data values
+            if (this.tIndex != objTBR.tIndex) return false;
+            if (this.pIndex != objTBR.pIndex) return false;
+
+
+            if (this.speciesInReactor.length != objTBR.speciesInReactor.length) return false;
+
+            //check speciesInReactor
+            for (int i = 0; i < this.speciesInReactor.length; i++) {
+                if (!this.speciesInReactor[i].equals(objTBR.speciesInReactor[i])) return false;
+            }
+                if (!this.input.equals(objTBR.input)) return false;
+                if (!this.heatX.equals(objTBR.heatX)) return false;
+                if (!this.rxns.equals(objTBR.rxns)) return false;
+                if (!this.pDrop.equals(objTBR.pDrop)) return false;
+
+            return true;
+            }
+
+
+
+        }
+
+
+
+

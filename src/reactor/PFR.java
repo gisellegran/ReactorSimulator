@@ -21,8 +21,7 @@ public class PFR extends TubularReactor {
     //accessors
     //mutators
     //class methods
-    public double returnA(){
-       return 4/this.pipeSize.returnInnerDiameter();}
+    public double returnA(){ return 4/this.getPipeSize().returnInnerDiameter();}
 
     public String toString(){
         String str = "Reactor type: PFR\n";
@@ -35,5 +34,9 @@ public class PFR extends TubularReactor {
     }
 
     //equals
-    //TODO: implement
+
+    @Override
+    public boolean equals(Object comparator) {
+        return super.equals(comparator);
+    }
 }

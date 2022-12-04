@@ -19,7 +19,7 @@ public abstract class Reactor implements SetOfODEs {
     public Reactor(double size ,PressureDropEquation pDrop, HeatTransferEquation heatX) {
         //check for null
         if (pDrop == null || heatX == null) {
-            System.exit(0); //TODO: error handling
+            throw new IllegalArgumentException("Pressure drop or Temperature is null");
         }
 
         this.size = size;
@@ -29,6 +29,7 @@ public abstract class Reactor implements SetOfODEs {
 
     //copy constructor
     public Reactor(Reactor source) {
+        if (source==null) throw new IllegalArgumentException("source is null");
         this.size = source.size;
         this.pDrop = source.pDrop.clone();
         this.heatX = source.heatX.clone();

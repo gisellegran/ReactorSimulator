@@ -17,7 +17,7 @@ public class Catalyst {
     //copy constructor
     public Catalyst(Catalyst source)
     {
-        if(source==null) System.exit(0);
+        if(source==null) {throw new IllegalArgumentException("source is null");}
         this.particleDiameter = source.particleDiameter;
         this.voidFraction = source.voidFraction;
         this.particleDensity = source.particleDensity;
@@ -30,10 +30,7 @@ public class Catalyst {
     }
 
     //accessors
-    public double getParticleDiameter()
-    {
-        return this.particleDiameter;
-    }
+    public double getParticleDiameter() {return this.particleDiameter;}
     public double getVoidFraction()
     {
         return this.voidFraction;
@@ -76,8 +73,7 @@ public class Catalyst {
     private double calculateArea (NominalPipeSizes pipeSize)
     {
         double innerDiameter = pipeSize.outerDiameter - 2.* pipeSize.wallThickness;
-        double area = Math.PI*Math.pow(innerDiameter, 2.)/4.;
-        return area;
+        return Math.PI*Math.pow(innerDiameter, 2.)/4.;
     }
 
     public double calculateErgunParameter(Stream s, NominalPipeSizes pipeSize)

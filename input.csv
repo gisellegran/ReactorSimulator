@@ -31,8 +31,8 @@ pbr
 FIVE_INCHES
 isothermal
 ergun_correlation,0.005,0.45,833
-design, flow
-D
+performance
+9.15
 
 
 

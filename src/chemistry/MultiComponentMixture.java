@@ -12,7 +12,7 @@ public abstract class MultiComponentMixture {
 
     //main constructor
     public MultiComponentMixture(Specie[] species, double[] molComposition,
-                                 double T, double P, double viscosity) {
+                                 double viscosity, double T, double P) {
         //TODO check null handling
         //check null array
         if( species == null) {throw new IllegalArgumentException("species array is null");}

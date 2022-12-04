@@ -14,8 +14,8 @@ public class Specie {
 
         // TODO check what to do with this
         // TODO do we need to check if a Enum is null
-        if ( heatCapacityCoeffs == null) { throw new IllegalArgumentException("null heat capacities"); }
-        if ( phase == null) { throw new IllegalArgumentException("phase is null"); }
+        if ( heatCapacityCoeffs == null ) { throw new IllegalArgumentException("heat capacity coefficients are null"); }
+        if ( phase == null ) { throw new IllegalArgumentException("phase is null"); }
 
         else if (heatCapacityCoeffs.length != 5){
             // TODO throw some error

@@ -17,12 +17,14 @@ public abstract class HeatTransferEquation{
 
     //main constructor
     public HeatTransferEquation(double U, double Ta){
+        //todo limits on values
+
         this.U = U;
         this.Ta0 = Ta;
     }
     //copy constructor
     public HeatTransferEquation(HeatTransferEquation source){
-        if (source == null) throw new IllegalArgumentException("null source");
+        if (source == null) throw new IllegalArgumentException("source is null");
         this.U = source.U;
         this.Ta0 = source.Ta0;
     }
@@ -56,6 +58,8 @@ public abstract class HeatTransferEquation{
     }
 
     private double returnTotalFCp(Stream s){
+        if (s == null) throw new IllegalArgumentException("stream is null");
+
         Specie[] species = s.getSpecies();
         double[] flowRates = s.getAllFlowRates();
         double T = s.getT();
@@ -82,4 +86,17 @@ public abstract class HeatTransferEquation{
     public abstract HeatTransferCondition getHeatTransferCondition();
     //clone
     public abstract HeatTransferEquation clone();
+
+    public boolean equals(Object comparator)
+    {
+        if(comparator == null) return false;
+        else if(this.getClass() != comparator.getClass()) return false;
+
+        boolean isEquals = true;
+        if(this.Ta0 != ((HeatTransferEquation) comparator).Ta0) isEquals = false;
+        if(this.U!= ((HeatTransferEquation) comparator).U) isEquals = false;
+        if(this.getHeatTransferCondition() != ((HeatTransferEquation) comparator).getHeatTransferCondition()) isEquals = false;
+        return isEquals;
+    }
 }
+

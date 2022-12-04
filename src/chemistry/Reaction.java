@@ -1,14 +1,12 @@
 package chemistry;
 
-import static chemistry.RateConstant.R;
-
 public class Reaction {
 
     private Specie[] species;
     private double[] stoichiometry;
     private RateLaw refReactionRate;
     private RefValue refEnthalpy;
-    private Phase phase;
+    private Phase phase;//todo: maybe remove
 
     //global variables
     int g_refI; // reference species index
@@ -16,18 +14,18 @@ public class Reaction {
     //constructor
     public Reaction (Specie[] species, double[] stoichiometry, RateLaw refReactionRate, RefValue refEnthalpy, Phase phase)
     {
-        //TODO; error handling
-        if(refReactionRate==null) System.exit(0);
-        if(stoichiometry==null) System.exit(0);
-        if(refEnthalpy==null) System.exit(0);
-        if(phase==null) System.exit(0);
 
-        //TODO; throw error if ref species is not in the species list
+        if(refReactionRate==null) throw new IllegalArgumentException("reaction rate is null");
+        if(stoichiometry==null) throw new IllegalArgumentException("stoichiometry is null");
+        if(refEnthalpy==null) throw new IllegalArgumentException("enthalpy is null");
+        if(phase==null) throw new IllegalArgumentException("phase is null");
 
         if (species.length != stoichiometry.length) {throw new IllegalArgumentException("array length mismatch");}
+        //check for null elements
         for (int i = 0; i < species.length; i++) {
             if (species[i] == null ) {throw new IllegalArgumentException("null element in array");}
         }
+
         this.species = new Specie[species.length];
         this.stoichiometry = new double[stoichiometry.length];
 
@@ -223,9 +221,9 @@ public class Reaction {
         else if(this.getClass() != comparator.getClass()) return false;
 
         boolean isEquals = true;
-        if(this.refReactionRate.equals(((Reaction) comparator).refReactionRate) == false) isEquals = false;
-        if(this.stoichiometry.equals(((Reaction) comparator).stoichiometry) == false) isEquals = false;
-        if(this.refEnthalpy.equals(((Reaction) comparator).refEnthalpy) == false) isEquals = false;
+        if(!this.refReactionRate.equals(((Reaction) comparator).refReactionRate)) isEquals = false;
+        if(!this.stoichiometry.equals(((Reaction) comparator).stoichiometry)) isEquals = false;
+        if(!this.refEnthalpy.equals(((Reaction) comparator).refEnthalpy)) isEquals = false;
         return isEquals;
     }
 
