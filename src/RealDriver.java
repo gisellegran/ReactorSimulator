@@ -450,12 +450,12 @@ public class RealDriver {
                 String desiredName = in.next().strip(); //get name of desired specie
                 desiredS = getSpecieFromName(desiredName, species);
                 if (toMaximize.equalsIgnoreCase("flow")) {
-                    PFRDesigner designer = new PFRDesigner(reactor);
+                    TubularReactorDesigner designer = new TubularReactorDesigner(reactor);
                     reactor = designer.returnReactorForMaxFlow(desiredS, inlet, rxnSet, delX, maxIt);
                 } else if (toMaximize.equalsIgnoreCase("selectivity")) {
                     String undesiredName = in.next();
                     undesiredS = getSpecieFromName(undesiredName, species);
-                    PFRDesigner designer = new PFRDesigner(reactor);
+                    TubularReactorDesigner designer = new TubularReactorDesigner(reactor);
                     reactor = designer.returnReactorForMaxSelectivity(desiredS, undesiredS, inlet, rxnSet, delX, maxIt);
                 } else {
                     throw new InputException("design problem type not sepcified");

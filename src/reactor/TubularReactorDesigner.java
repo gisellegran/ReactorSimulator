@@ -1,254 +1,152 @@
 package reactor;
 
 import chemistry.*;
-import numericalmethods.Euler;
-import numericalmethods.SetOfODEs;
-import reactor.heat_transfer.HeatTransferEquation;
-import reactor.pressure_drop.PressureDropEquation;
-
-public abstract class TubularReactorDesigner implements SetOfODEs{
-
-        //Global variables
-        private Phase phase;
-        private ReactionSet rxns; //TODO: not sure about having any of these in the reactor class
-        private Specie[] speciesInReactor;
-        private Stream input;
-        private int tIndex; //index of temperature associated position in array
-        private int pIndex; //index of pressure associated position in array
-
-        private HeatTransferEquation heatX;
-        private PressureDropEquation pDrop;
+import numericalmethods.*;
 
 
+public class TubularReactorDesigner implements NonLinearEquation {
+
+    //max size of a reactor is 500m3
+
+    //instance variables
+    private TubularReactor reactor;
+
+    //Global variables
+    private  double g_Vmax;
+    private Specie g_desiredSpecie;
+    private Specie g_undesiredSpecie;
+    private double g_targetF;
+    private ReactionSet g_rxns;
+    private Stream g_input;
+
+    private double g_delX;
+
+    private int g_maxIt;
+    private String g_toMaximize;
 
 
-        private void setGlobalVariables(ReactionSet rxns, Stream input, PressureDropEquation pDrop, HeatTransferEquation heatX){
+    public TubularReactorDesigner(TubularReactor reactor){
+        this.reactor = reactor.clone();
+        resetGlobalVariables();
+    }
 
-            this.phase = input.returnPhase();
-            this.rxns = rxns.clone();
-            MultiComponentMixture temp = input.clone();
-            temp.addAllSpecies(rxns.returnSpecies());
-            this.speciesInReactor = temp.getSpecies();
-            this.input = input.clone();
-            this.pIndex = this.speciesInReactor.length;
-            this.tIndex = this.speciesInReactor.length+1;
+    public TubularReactorDesigner(TubularReactorDesigner source){
+        this.reactor = source.reactor.clone();
+        resetGlobalVariables();
+    }
 
-            this.pDrop = pDrop;
-            //this.heatX = heatX;//TODO: implement
+
+    private void setGlobalVariables(Specie desiredSpecie, Specie undesiredSpecie, double targetF, String toMaximize,
+                                    ReactionSet rxns, Stream input, double delX, int maxIt){
+        this.g_desiredSpecie = desiredSpecie;
+        this.g_undesiredSpecie = undesiredSpecie;
+        this.g_targetF = targetF;
+        this.g_toMaximize = toMaximize;
+        this.g_rxns = rxns;
+        this.g_input = input;
+        this.g_delX = delX;
+        this.g_maxIt = maxIt;
+    }
+
+    private void resetGlobalVariables(){
+        this.g_Vmax = 100;
+        this.g_desiredSpecie = null;
+        this.g_undesiredSpecie = null;
+        this.g_targetF = -1.;
+        this.g_toMaximize = null;
+        this.g_rxns = null;
+        this.g_input = null;
+        this.g_delX = -1;
+        this.g_maxIt = -1;
+
+    }
+
+
+    public TubularReactor returnReactorForTargetConversion(Specie targetS, double targetX, Stream input, ReactionSet rxns,
+                                                           double delX, int maxIt){
+        //convert conversion to target flow rate
+        double targetF =  input.returnSpecieFlowRate(targetS)*(1-targetX);
+        return returnReactorForTargetFlow( targetS, targetF, input, rxns, delX, maxIt);
+
+    }
+
+    public TubularReactor returnReactorForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns, double delX, int maxIt){
+        setGlobalVariables(s, null, targetF, null, rxns, input, delX, maxIt);
+        TubularReactor result = this.reactor.clone();
+        double v = result.getSize();
+        while(true) {
+            try {
+                v = RootFinder.findRoot(0., this.g_Vmax, 0.0005, 500000, this);
+                break;
+            } catch (RootFindingException e) {
+                //todo: handle eerror
+            }
         }
 
-        private void resetGlobalVariables(){
-            this.phase = null;
-            this.rxns = null;
-            this.speciesInReactor = null;
-            this.input = null;
-            this.tIndex = 0;
-            this.pIndex = 0;
-            this.pDrop = pDrop;
-            this.heatX = heatX;
+        result.setSize(v);
+        resetGlobalVariables();
 
+        return result;
+    }
 
-        }
+    public TubularReactor returnReactorForMaxFlow(Specie s, Stream input, ReactionSet rxns, double delX, int maxIt){
+        setGlobalVariables(s, null, -1., "flow", rxns, input, delX, maxIt);
+        TubularReactor result = this.reactor.clone();
+        double v = result.getSize();
+        int count = 0;
+        int maxTries = 500000;
 
-        protected double returnPDrop() {
-            return 0.; //TODO: change this to pressure drop equation
-        }
-
-        protected double returnHeatX() {
-            return 0.; //TODO: change this to heat transfer equation
-        }
-
-        private int getTargetIndex(Specie s) {
-            int targetIndex = -1;
-
-            if (s==null) throw new IllegalArgumentException("specie is null");
-            for (int i = 0; i < this.speciesInReactor.length; i++) {
-                if (this.speciesInReactor[i].equals(s)) {
-                    targetIndex = i;
-                    break;
-                }
+        while(true) {
+            try {
+                v = GoldenSectionSearch.search(0., this.g_Vmax, 0.0005,  this);
+                break;
+            } catch (GoldenSearchException e) {
+                this.g_Vmax = e.getX_i();
+                if (++count == maxTries) {;}//todo: throw error ;
             }
-            return targetIndex;
-        }
-
-        //TODO: fix
-    /*
-        public TubularReactor returnVForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns,
-                                        PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize, double delX, int maxIt){
-            setGlobalVariables(rxns, input, pDrop, heatX);
-
-            //get total y array length; length = species + T + P
-            int n = this.speciesInReactor.length + 2;
-
-            double[] yf = new double[n];
-            double[] y0 = new double[n];
-
-
-            //get initial T & P
-            y0[tIndex] = input.getT();
-            y0[pIndex] = input.getP();
-
-
-            double x0 = 0.;
-            double xf =0.;
-
-            int iterationCount = 0;
-            double multiplyer = 1.;
-            //get inlet FlowRates
-            for (int i = 0; i < this.speciesInReactor.length; i++) {
-                if (input.hasSpecie(this.speciesInReactor[i])){
-                    y0[i] = input.returnSpecieFlowRate(this.speciesInReactor[i]);
-                } else {
-                    // set flow rate of species which are not present in the input stream to 0
-                    y0[i] = 0;
-                }
-            }
-
-            int targetIndex = this.getTargetIndex(s);
-
-            do {
-                iterationCount ++;
-                //update parameters
-
-                x0 = xf;
-                xf += delX*multiplyer;
-
-                yf = Euler.integrate(x0, xf, y0, delX, maxIt, this);
-
-                if ((Math.abs(yf[targetIndex]-y0[targetIndex])/y0[targetIndex]) <0.001){
-                    multiplyer *= 2.;
-                }
-
-            if ((Math.abs(yf[targetIndex]-y0[targetIndex])/y0[targetIndex]) >0.1){
-                multiplyer /= 2.;
-            }
-
-                //update y0
-                for (int i = 0; i < this.speciesInReactor.length; i++) {
-                    y0[i] = yf[i];
-                }
-
-
-
-            } while (yf[targetIndex] > targetF && iterationCount<maxIt && xf<100000);
-
-            if (xf>100000){
-                //TODO: throw error
-                System.out.println("input does not converge");
-                System.exit(0);
-            }
-            TubularReactor result = this.buildReactor(xf, pDrop, heatX, pipeSize);
-            resetGlobalVariables();
-
-            //generate stream
-            return result;
-        } */
-
-        public abstract TubularReactor buildReactor(double size, PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize);
-
-        public double[] calculateValue(double x, double[] y0){
-            Stream currentOutput = this.getStreamFromY(y0);
-            double[] dely = new double[y0.length];
-            dely[this.tIndex] = returnHeatX();
-            dely[this.pIndex] = returnPDrop();
-            double[] rates = this.rxns.returnNetRxnRates(currentOutput);
-            for (int i = 0; i < this.speciesInReactor.length; i++) {
-                dely[i] = rates[i];
-            }
-
-            return dely;
-        }
-
-        protected Stream getStreamFromY(double[] y) {
-
-            if (y == null) { throw new IllegalArgumentException("y is null");
-            }
-
-            double T, P, viscocity;
-
-            //make local deep copy of y
-            double[] tempY = new double[y.length];
-
-            for (int i = 0; i < tempY.length; i++) {
-                tempY[i] = y[i];
-            }
-
-            //get T and P
-            T = y[this.tIndex];
-            P = y[this.pIndex];
-
-            //viscocity stays constant in our case
-            viscocity = input.getViscosity();
-
-            //put flow rates in an array
-            double[] flowRates = new double[tempY.length - 2];
-
-            for (int i = 0; i < flowRates.length; i++) {
-                flowRates[i] = y[i];
-            }
-
-            Stream result = null;
-            if (this.phase == Phase.IDEALGAS) {
-                //gas is compressible
-                result = StreamBuilder.buildGasStreamFromMolFlows(this.speciesInReactor, flowRates, T, P, viscocity);
-            }
-            else if (this.phase == Phase.LIQUID) {
-                //assume constant density => constant flow rate
-                double volFlow = input.getVolFlowRate();
-                result = StreamBuilder.buildStreamFromMolFlows(this.speciesInReactor, flowRates, T, P, viscocity, volFlow);
-            } else {
-                 throw new IllegalArgumentException("flow rate is assumed to be constant");
-            }
-
-            return result;
         }
 
 
-        protected double returnOutputGasVolFlowRate(double FT, double T, double P) {
-            double v0, FT0, P0, T0;
-            v0 = input.getVolFlowRate();
-            FT0 = input.getMolarFlowRate();
-            P0 = input.getP();
-            T0 = input.getT();
-            return v0*(FT/FT0)*(P0/P)*(T/T0);
-        }
+        result.setSize(v);
+        resetGlobalVariables();
 
-        //equals
-        public boolean equals(Object obj)
-            {
-            //check for null
+        return result;
+    }
 
-            if (obj == null) return false;
-
-            //check that classes are equal
-            if (this.getClass() != obj.getClass()) return false;
-
-            //convert obj to reactor
-            TubularReactorDesigner objTBR = (TubularReactorDesigner) obj;
-
-            //check primitive data values
-            if (this.tIndex != objTBR.tIndex) return false;
-            if (this.pIndex != objTBR.pIndex) return false;
-
-
-            if (this.speciesInReactor.length != objTBR.speciesInReactor.length) return false;
-
-            //check speciesInReactor
-            for (int i = 0; i < this.speciesInReactor.length; i++) {
-                if (!this.speciesInReactor[i].equals(objTBR.speciesInReactor[i])) return false;
+    public TubularReactor returnReactorForMaxSelectivity(Specie s_desired, Specie s_undesired, Stream input, ReactionSet rxns, double delX, int maxIt){
+        setGlobalVariables(s_desired, s_undesired, -1., "selectivity", rxns, input, delX, maxIt);
+        TubularReactor result = this.reactor.clone();
+        double v = result.getSize();
+        while(true) {
+            try {
+                v = GoldenSectionSearch.search(0., this.g_Vmax, 0.0005, this);
+                break;
             }
-                if (!this.input.equals(objTBR.input)) return false;
-                if (!this.heatX.equals(objTBR.heatX)) return false;
-                if (!this.rxns.equals(objTBR.rxns)) return false;
-                if (!this.pDrop.equals(objTBR.pDrop)) return false;
-
-            return true;
+            catch (GoldenSearchException e){
+                //todo: handle error
             }
-
-
-
         }
+        result.setSize(v);
+        resetGlobalVariables();
+
+        return result;
+    }
 
 
+    public double returnValue(double x){
+        this.reactor.setSize(x);
+        Stream output = this.reactor.returnReactorOutput(g_input, g_rxns, g_delX, g_maxIt);
+        return output.returnSpecieFlowRate(g_desiredSpecie) - this.g_targetF;
+    }
 
+    public double returnEquationResult(double x){
+        double result;
+        this.reactor.setSize(x);
+        Stream output = this.reactor.returnReactorOutput(g_input, g_rxns, g_delX, g_maxIt);
+        //default result is flow rate
+        result = -output.returnSpecieFlowRate(g_desiredSpecie); //negative because search minimizes
+        if (this.g_toMaximize.equalsIgnoreCase("selectivity")) result /= output.returnSpecieFlowRate(g_undesiredSpecie);
+        return result;
+    }
 
+}
