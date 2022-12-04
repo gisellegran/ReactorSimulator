@@ -24,6 +24,7 @@ public abstract class PressureDropEquation{
     public abstract double calculateValue(MultiComponentMixture mix);
 
 
+    public abstract PressureDropCondition getPressureDropCondition();
     //clone
     public abstract PressureDropEquation clone();
 

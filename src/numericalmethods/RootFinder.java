@@ -1,8 +1,7 @@
 package numericalmethods;
-
 public class RootFinder
 {
-    public static double findRoot(double x_0, double x_f, double tol, long maxIt, NonLinearEquation e)
+    public static double findRoot(double x_0, double x_f, double tol, long maxIt, NonLinearEquation e) throws RootFindingException
     {
         double x_lower=x_0;
         double x_upper=x_f;
@@ -34,9 +33,8 @@ public class RootFinder
             }
             iter++;
         } while(err>tol && iter<maxIt);
-        if(err>tol) {};
+        if(err>tol) throw new RootFindingException(x_lower,x_upper,tol, maxIt, err );
         return x_mid;
     }//end of findRoot
 
 }//end of RootFinder
-

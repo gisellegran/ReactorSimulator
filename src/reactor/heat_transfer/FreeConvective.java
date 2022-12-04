@@ -12,6 +12,10 @@ public class FreeConvective extends HeatTransferEquation{
     public FreeConvective(FreeConvective source){
         super(source);
     }
+
+    public HeatTransferCondition getHeatTransferCondition(){
+        return this.condition;
+    };
     public FreeConvective clone(){
         return new FreeConvective(this);
     }

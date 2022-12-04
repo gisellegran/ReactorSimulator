@@ -3,12 +3,17 @@ package numericalmethods;
 public class GoldenSectionSearch {
     private static final double r = (3 - Math.sqrt(5))/2;
 
-    public static double search(double x_0, double x_f, double eps, NonLinearEquation f) {
+    public static double search(double x_0, double x_f, double eps, NonLinearEquation f) throws GoldenSearchException{
         double c, d, z, yc, yd;
         c = x_0 + r * (x_f - x_0);
-        yc = f.returnEquationResult(c);
+        try {
+        yc = f.returnEquationResult(c);}
+        catch (IllegalArgumentException e){
+            throw new GoldenSearchException(x_0, x_f, eps, c);
+        }
         d = x_0 + (1 - r) * (x_f - x_0);
         yd = f.returnEquationResult(d);
+        search (x_0, d, eps, f);
         while ((d - c) >Math.sqrt(eps) * Math.max(Math.abs(c), Math.abs(d))) {
             if (yc >= yd) {
                 z = c + (1 - r) * (x_f - c);

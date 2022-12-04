@@ -17,6 +17,9 @@ public class CoCurrent extends HeatExchanger {
         return new CoCurrent(this);
     }
 
+    public HeatTransferCondition getHeatTransferCondition(){
+        return this.condition;
+    };
     public double calculateDelTa(double a, double Ta, double T){
         return (this.getU()*a*(T-Ta))/(this.getM()*this.getCp());
     }

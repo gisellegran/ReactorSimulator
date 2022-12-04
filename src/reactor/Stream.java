@@ -135,15 +135,6 @@ public class Stream extends MultiComponentMixture{
         return new Stream(this);
     }
 
-    public static String doubleArrayToString(Specie[] s, double[] array){
-        DecimalFormat df = new DecimalFormat("0.000");
-        String str = "";
-        for (int i = 0; i < array.length; i++) {
-            str += (s[i].getName()+": "+df.format(array[i]));
-            if (i < array.length-1) str += ", ";
-        }
-        return "{ "+str+" }";
-    }
 
     //toString
     //todo: maybe remove
@@ -157,9 +148,17 @@ public class Stream extends MultiComponentMixture{
     }*/
 
     public String molarFlowRatesToString(){
+
         Specie[] species = this.getSpecies();
-        String str = "Component molar flow rate: "+this.doubleArrayToString(species, this.getAllFlowRates());
-        return str;
+        double[] flowRates = this.getAllFlowRates();
+        DecimalFormat df = new DecimalFormat("0.000");
+        String str = "";
+        for (int i = 0; i < species.length; i++) {
+            str += (species[i].getName()+": "+df.format(flowRates[i]));
+            if (i < species.length-1) str += ", ";
+        }
+        return "{ "+str+" }";
+
     }
     //equals
     public boolean equals(Object obj) {

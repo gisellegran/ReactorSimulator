@@ -1,21 +1,18 @@
 package reactor;
 
 import chemistry.*;
-import numericalmethods.GoldenSectionSearch;
-import numericalmethods.NonLinearEquation;
-import numericalmethods.RootFinder;
-import reactor.heat_transfer.HeatTransferEquation;
-import reactor.pressure_drop.PressureDropEquation;
+import numericalmethods.*;
 
 
 public class PFRDesigner implements NonLinearEquation {
 
-    public static final double vMax = 1000; //max size of a reactor is 500m3
+     //max size of a reactor is 500m3
 
     //instance variables
     private TubularReactor reactor;
 
     //Global variables
+    private  double g_Vmax;
     private Specie g_desiredSpecie;
     private Specie g_undesiredSpecie;
     private double g_targetF;
@@ -52,6 +49,7 @@ public class PFRDesigner implements NonLinearEquation {
     }
 
     private void resetGlobalVariables(){
+        this.g_Vmax = 100;
         this.g_desiredSpecie = null;
         this.g_undesiredSpecie = null;
         this.g_targetF = -1.;
@@ -74,8 +72,17 @@ public class PFRDesigner implements NonLinearEquation {
 
     public TubularReactor returnReactorForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns, double delX, int maxIt){
         setGlobalVariables(s, null, targetF, null, rxns, input, delX, maxIt);
-        double v = RootFinder.findRoot(0., this.vMax, 0.0005, 500000, this);
         TubularReactor result = this.reactor.clone();
+        double v = result.getSize();
+        while(true) {
+            try {
+                v = RootFinder.findRoot(0., this.g_Vmax, 0.0005, 500000, this);
+                break;
+            } catch (RootFindingException e) {
+                //todo: handle eerror
+            }
+        }
+
         result.setSize(v);
         resetGlobalVariables();
 
@@ -84,8 +91,22 @@ public class PFRDesigner implements NonLinearEquation {
 
     public TubularReactor returnReactorForMaxFlow(Specie s, Stream input, ReactionSet rxns, double delX, int maxIt){
         setGlobalVariables(s, null, -1., "flow", rxns, input, delX, maxIt);
-        double v = GoldenSectionSearch.search(0., this.vMax, 0.0005,  this);
         TubularReactor result = this.reactor.clone();
+        double v = result.getSize();
+        int count = 0;
+        int maxTries = 500000;
+
+        while(true) {
+            try {
+                v = GoldenSectionSearch.search(0., this.g_Vmax, 0.0005,  this);
+                break;
+            } catch (GoldenSearchException e) {
+                this.g_Vmax = e.getX_i();
+                if (++count == maxTries) {;}//todo: throw error ;
+            }
+        }
+
+
         result.setSize(v);
         resetGlobalVariables();
 
@@ -93,9 +114,18 @@ public class PFRDesigner implements NonLinearEquation {
     }
 
     public TubularReactor returnReactorForMaxSelectivity(Specie s_desired, Specie s_undesired, Stream input, ReactionSet rxns, double delX, int maxIt){
-        setGlobalVariables(s_desired, null, -1., "selectivity", rxns, input, delX, maxIt);
-        double v = GoldenSectionSearch.search(0., this.vMax, 0.0005,  this);
+        setGlobalVariables(s_desired, s_undesired, -1., "selectivity", rxns, input, delX, maxIt);
         TubularReactor result = this.reactor.clone();
+        double v = result.getSize();
+        while(true) {
+            try {
+                v = GoldenSectionSearch.search(0., this.g_Vmax, 0.0005, this);
+                break;
+            }
+            catch (GoldenSearchException e){
+                //todo: handle error
+            }
+        }
         result.setSize(v);
         resetGlobalVariables();
 

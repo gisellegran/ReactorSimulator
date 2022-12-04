@@ -16,6 +16,17 @@ public class StreamBuilder {
         return new Stream(species, molComposition, T, P, viscocity, volFlowRate, totalMolFlow);
     }
 
+    public static  Stream buildGasStream(Specie[] species, double[] molFlows,
+                                                  double viscocity, double volFlowRate) {
+        //TODO: check for null molFlows array
+        double totalMolFlow = StreamBuilder.returnTotalMolFlow(molFlows);
+
+        double[] molComposition = StreamBuilder.returnMolComposition(molFlows);
+
+        //default values of T & P are 298 and 101325
+        return new Stream(species, molComposition, 298, 101325, viscocity, volFlowRate, totalMolFlow);
+    }
+
     private static double returnTotalMolFlow(double[] molFlows){
         //dont need to check null array because already checked in the public methods
         //which call this method as a helper method

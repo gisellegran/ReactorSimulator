@@ -1,0 +1,39 @@
+Species
+A,B,C,D,E
+g,g,g,g,g
+
+Reactions
+2
+Reaction 1
+-1,-2,1,1,0
+A
+
+100,0
+elementary
+reversible
+1000
+Reaction 2
+-2,0,-2,0,1
+C
+
+1500,0
+elementary
+
+
+Inlet
+
+100
+mol flows
+10,20,0,0,0
+
+Reactor
+pfr
+ONE_INCH
+isothermal
+isobaric
+performance
+9.15
+
+
+
+

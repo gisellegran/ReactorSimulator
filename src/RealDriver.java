@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class RealDriver {
     //takes comma delimited line and converts to array of doubles
 
-    private static double delX = 0.01;
+    private static double delX = 0.05;
     private static int maxIt = 500000;
     private static double[] stringToDoubleArray(String s){
         String[] strArr = s.split(",");
@@ -109,7 +109,7 @@ public class RealDriver {
         if (line == null) throw new IllegalArgumentException("line is null");
         //rate constant
         Scanner lineScan = new Scanner(line);
-        lineScan.useDelimiter(",|\n");
+        lineScan.useDelimiter(",");
         double A = lineScan.nextDouble();
         double E = 0.;
         if (lineScan.hasNextDouble()) E = lineScan.nextDouble();
@@ -166,6 +166,7 @@ public class RealDriver {
     private static Catalyst getCatalystFromLine(String line){
         if (line == null) throw new IllegalArgumentException("line is null");
         Scanner lineScan = new Scanner(line);
+        lineScan.useDelimiter(",|\n");
         double pDiameter, voidFrac, pDensity;
         if( !lineScan.hasNextDouble() ) throw new IllegalArgumentException("missing catalyst data");
         pDiameter = lineScan.nextDouble();
@@ -194,7 +195,7 @@ public class RealDriver {
     public static void writeData(FileOutputStream destination, Reactor reactor, Stream outlet){
         PrintWriter outputStream = new PrintWriter(destination);//PrintWriter is buffered, which is more efficient
         outputStream.println(reactor.toString());
-        outputStream.println("Oulet stream molar flows:"+ outlet.molarFlowRatesToString());
+        outputStream.println("Outlet stream molar flows: "+ outlet.molarFlowRatesToString());
         outputStream.close();
 
     }
@@ -307,6 +308,7 @@ public class RealDriver {
                             throw new IllegalArgumentException("invalid number of orders provided");
 
                         Keq = in.nextDouble();
+                        in.nextLine();
                         rateLaw = new ReversibleRateLaw(k, refSpecie, Keq, orders, backwardsOrders);
                         break;
 
@@ -324,9 +326,6 @@ public class RealDriver {
             if (!rxnSet.isSinglePhase()) throw new IllegalArgumentException("program can only handle single phase problems");
 
 
-            in.nextLine(); //skip empty line
-            in.nextLine(); //skip line that says reactor
-
             //inlet stream
             in.nextLine(); //skip empty line
             in.nextLine(); //skip line that says inlet
@@ -337,16 +336,16 @@ public class RealDriver {
             Scanner lineScan = new Scanner(in.nextLine());
             lineScan.useDelimiter(",|\n");
             if (lineScan.hasNextDouble()) T = lineScan.nextDouble();
-            else T = 298.;//default value
+            else T = -1;
             if (lineScan.hasNextDouble()) P = lineScan.nextDouble();
-            else P = 101325.;
+            else P = -1;
             if (lineScan.hasNextDouble()) viscosity = lineScan.nextDouble();
             else viscosity = 1.8E-5; //default value
             lineScan.close();
 
             Phase phase = species[0].getPhase(); //all species were checked to have the same phase
 
-            if (phase == Phase.LIQUID ) {
+            if (phase == Phase.LIQUID || (phase == Phase.IDEALGAS && T < 0 && P < 0)) {
                 if (in.hasNextDouble()) {
                     volFlowRate = in.nextDouble();
                     in.nextLine(); //advance cursor
@@ -382,6 +381,9 @@ public class RealDriver {
 
             }
 
+            in.nextLine(); //skip empty line
+            in.nextLine(); //skip line that says reactor
+
             //reactor type
             String reactorType = in.nextLine();
 
@@ -394,7 +396,7 @@ public class RealDriver {
 
             //pressure drop
             lineScan = new Scanner(in.nextLine());
-            lineScan.useDelimiter(",");
+            lineScan.useDelimiter(",|\n");
             PressureDropCondition pDropCondition = PressureDropCondition.findByName(lineScan.next());
             lineScan.reset(); //reset delimiter
 
@@ -414,7 +416,8 @@ public class RealDriver {
             lineScan.close();
 
             //problem type
-            String problem = in.nextLine();//
+            in.useDelimiter(",|\n");
+            String problem = in.next();//
 
             if(!problem.equalsIgnoreCase("performance") && !problem.equalsIgnoreCase("design")){
                 throw new IllegalArgumentException("invalid problem type");
@@ -461,7 +464,7 @@ public class RealDriver {
 
             in.close();//advance cursor to next line
 
-            Stream outlet = reactor.returnReactorOutput(inlet, rxnSet, 0.01, 1000000 );
+            Stream outlet = reactor.returnReactorOutput(inlet, rxnSet, delX, 1000000 );
 
             FileOutputStream output = new FileOutputStream("output.txt");
             writeData(output, reactor, outlet);

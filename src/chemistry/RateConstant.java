@@ -4,7 +4,8 @@ public class RateConstant {
     //instance variables
     private double A;
     private double activationE;
-    public static final double R = 0.082057338; //L.atm.K-1.mol-1
+    //public static final double R = 0.082057338; //L.atm.K-1.mol-1
+    public static final double R = 8.3145; //L.atm.K-1.mol-1
 
     //constructor
     public RateConstant(double A, double activationE)

@@ -2,6 +2,7 @@ package chemistry;
 
 //TODO: maybe make elementary rate law class
 public class PowerRateLaw extends RateLaw {
+    private static final double R = 8.2057E-5; //m3 atm/mol K) reaction partial pressures should always be in atm
     private double[] orders;
 
     //constructor
@@ -49,9 +50,21 @@ public class PowerRateLaw extends RateLaw {
     public double returnRate(MultiComponentMixture mix) {
 
         if (this.orders.length != mix.returnNumberOfSpecies()) throw new IllegalArgumentException("mismatch between number of species and number of orders");
-        double[] concentrations = mix.returnAllMolConcentrations();
+        double[] concentrations;
         double T = mix.getT();
         double rate = super.getK().returnRateConstant(T);
+
+        // we use the partial pressure instead of mo concentration for gas
+        if (mix.returnPhase() == Phase.IDEALGAS) {
+            double[] conc = mix.returnAllMolConcentrations();
+            concentrations = new double[conc.length];
+
+            double mixT = mix.getT();
+
+            for (int i = 0; i < conc.length; i++) {
+                concentrations[i] = conc[i] * this.R * mixT;
+            }
+        } else concentrations = mix.returnAllMolConcentrations();
 
         for (int i = 0; i < this.orders.length; i++) {
             rate *= Math.pow(concentrations[i],this.orders[i]);

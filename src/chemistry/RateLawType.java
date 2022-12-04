@@ -22,7 +22,7 @@ public enum RateLawType {
         if (isElementary && !isReversible) return RateLawType.ELEMENTARY;
 
         //power is default
-        return RateLawType.ELEMENTARY;
+        return RateLawType.POWER;
 
     }
 

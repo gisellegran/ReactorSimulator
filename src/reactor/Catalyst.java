@@ -81,7 +81,7 @@ public class Catalyst {
     }
 
     public double calculateErgunParameter(Stream s, NominalPipeSizes pipeSize)
-    {   double density = s.returnDensity()/1000; //put into kg/m3
+    {   double density = s.returnDensity(); //density should be kg/m3
         double velocity = s.getVolFlowRate()/calculateArea(pipeSize);
         double massVelocity = velocity*density;
         double beta_0 = ((massVelocity*(1.-this.voidFraction))/(density*1.*this.particleDiameter*Math.pow(this.voidFraction,3.)))*

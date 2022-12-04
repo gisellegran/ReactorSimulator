@@ -22,7 +22,7 @@ public class PFR extends TubularReactor {
     //mutators
     //class methods
     public double returnA(){
-       return 4/pipeSize.returnInnerDiameter();}
+       return 4/this.pipeSize.returnInnerDiameter();}
 
     public String toString(){
         String str = "Reactor type: PFR\n";

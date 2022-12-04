@@ -18,6 +18,10 @@ public class Isothermal extends HeatTransferEquation{
         return new Isothermal(this);
     }
 
+    public HeatTransferCondition getHeatTransferCondition(){
+        return this.condition;
+    };
+
     //rhs of the heat transfer equation
     @Override
     public double calculateDelT(double a, Stream s, ReactionSet rxnSet) {

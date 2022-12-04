@@ -165,26 +165,12 @@ public class Reaction {
             //TODO: error handling
         }
 
-
         //TODO; if mix has species not in reaction
-
-        double[] conc; //values to be passed to reaction rate for calculation
-        //concentration for liquid andpartial pressure for gas
 
         //absolute value of the reference species stoichiometric coefficient, for normalizing the reaction rate
         double refV = Math.abs(this.stoichiometry[g_refI]);
 
         double normalizedRefRate;
-        if (mix.returnPhase() == Phase.IDEALGAS) {
-            double[] concentrations = mix.returnAllMolConcentrations();
-            conc = new double[this.species.length];
-
-            double mixT = mix.getT();
-
-            for (int i = 0; i < concentrations.length; i++) {
-                conc[i] = concentrations[i] * R * mixT;
-            }
-        } else conc = mix.returnAllMolConcentrations();
 
         normalizedRefRate = this.refReactionRate.returnRate(mix)/refV;
 

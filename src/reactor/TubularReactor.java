@@ -40,6 +40,7 @@ public abstract class TubularReactor extends Reactor {
     //copy constructor
     public TubularReactor(TubularReactor source){
         super(source);
+        this.pipeSize = source.pipeSize;
         resetGlobalVariables();
     }
 
@@ -85,8 +86,7 @@ public abstract class TubularReactor extends Reactor {
     }
 
     //point is either weight or volume depending if its g_a PFR of g_a PBR
-    public Stream returnReactorOutputAtPoint(double point, Stream input, ReactionSet rxn,
-                                             double delX, int maxIt){
+    public Stream returnReactorOutputAtPoint(double point, Stream input, ReactionSet rxn, double delX, int maxIt){
         //TODO; implement check that all species in the reactions ar ein the input stream and vice versa
         //checks to make first
         //check for null objects
@@ -185,7 +185,13 @@ public abstract class TubularReactor extends Reactor {
     }
 
     public double[] calculateValue(double x, double[] y){
-        Stream currentOutput = this.getStreamFromY(y);
+        Stream currentOutput = null;
+        try {
+            currentOutput = this.getStreamFromY(y);
+        }
+        catch (IllegalArgumentException e){
+            x = x;
+        }
         double[] dely = new double[y.length];
         dely[this.g_Pindex] = this.getpDrop().calculateValue(currentOutput);
         dely[this.g_Tindex] = this.getHeatX().calculateDelT(g_a, currentOutput, g_reactions);
@@ -221,7 +227,7 @@ public abstract class TubularReactor extends Reactor {
     public abstract TubularReactor clone();
 
     public String toString(){
-        return super.toString()+"\nPipeSize :"+this.pipeSize;
+        return super.toString()+"\nPipeSize: "+this.pipeSize;
     }
     //equals
 }

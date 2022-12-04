@@ -30,7 +30,7 @@ public enum Element {
             System.exit(0);
         }
         this.name = name;
-        this.molarMass = molarMass;
+        this.molarMass = molarMass/1000.;//convert to kg/mol
         this.heatCapacityCoefficients = new double[5];
         this.heatCapacityCoefficients[0] = heatCapacityCoefficients[0]*1E0;
         this.heatCapacityCoefficients[1] = heatCapacityCoefficients[1]*1E-2;

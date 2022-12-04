@@ -20,6 +20,8 @@ public class ReversibleRateLaw extends RateLaw {
         if ((forwardOrders.length != backwardOrders.length)) throw new IllegalArgumentException("array length mismatch between order arrays");
 
         this.Keq = Keq;
+        this.forwardOrders = new double[forwardOrders.length];
+        this.backwardOrders = new double[backwardOrders.length];
         //set forward and backwards array in same for loop since hey have the same length
         for (int i = 0; i < forwardOrders.length; i++) {
             this.forwardOrders[i] = forwardOrders[i];
@@ -34,6 +36,8 @@ public class ReversibleRateLaw extends RateLaw {
         super(source);
 
         this.Keq = source.Keq;
+        this.forwardOrders = new double[source.forwardOrders.length];
+        this.backwardOrders = new double[source.backwardOrders.length];
         //set forward and backwards array in same for loop since hey have the same length
         for (int i = 0; i < source.forwardOrders.length; i++) {
             this.forwardOrders[i] = source.forwardOrders[i];

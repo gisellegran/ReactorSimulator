@@ -1,9 +1,8 @@
 package reactor.heat_transfer;
 
-public class CounterCurrentSolver extends HeatTransferEquation{
+public class CounterCurrentSolver{
 
     public CounterCurrentSolver(CounterCurrentSolver source){
-        super(source);
 
     }
 

@@ -4,15 +4,10 @@ import reactor.Catalyst;
 import reactor.NominalPipeSizes;
 import reactor.Stream;
 
-import java.io.PipedInputStream;
-
 public class ErgunPDrop extends PressureDropEquation{
 
     public static final PressureDropCondition condition = PressureDropCondition.ERGUN_CORRELATION;
 
-    //global variables
-    private Stream s0;
-    private Stream s;
     private NominalPipeSizes pipeSize;
 
     //instance variable
@@ -48,6 +43,10 @@ public class ErgunPDrop extends PressureDropEquation{
         rhsODE = (-this.catalyst.calculateErgunParameter(stream,this.pipeSize)/(2.));
         return rhsODE;
     }
+
+    public PressureDropCondition getPressureDropCondition(){
+        return this.condition;
+    };
 
     //clone
     public ErgunPDrop clone() {return new ErgunPDrop(this);}

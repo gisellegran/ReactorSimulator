@@ -18,6 +18,10 @@ public class Isobaric extends PressureDropEquation{
         return 0.0;
     };
 
+    public PressureDropCondition getPressureDropCondition(){
+        return this.condition;
+    };
+
     //clone
     public Isobaric clone(){
         return new Isobaric(this);

@@ -100,8 +100,8 @@ public abstract class Reactor implements SetOfODEs {
     //string
     public String toString(){
         String str = "size: "+ this.size;
-        str += "\npressure drop: "+pDrop.condition;
-        str += "\nheat transfer: "+heatX.condition;
+        str += "\npressure drop: "+pDrop.getPressureDropCondition();
+        str += "\nheat transfer: "+heatX.getHeatTransferCondition();
         return str;
     }
 

@@ -18,6 +18,10 @@ public class Adiabatic extends HeatTransferEquation{
         return new Adiabatic(this);
     }
 
+    public HeatTransferCondition getHeatTransferCondition(){
+        return this.condition;
+    };
+
     //rhs of the heat transfer equation
     @Override
     public boolean equals(Object obj) {

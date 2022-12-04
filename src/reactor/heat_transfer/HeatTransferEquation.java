@@ -5,6 +5,7 @@ import chemistry.Reaction;
 import chemistry.ReactionSet;
 import chemistry.Specie;
 import reactor.Stream;
+import reactor.pressure_drop.PressureDropCondition;
 
 //maybe rename to tubular
 public abstract class HeatTransferEquation{
@@ -77,6 +78,8 @@ public abstract class HeatTransferEquation{
         double T = s.getT();
         return (this.returnHeatGenerated(rxns, s)-this.returnHeatRemoved(a, T))/this.returnTotalFCp(s);
     }
+
+    public abstract HeatTransferCondition getHeatTransferCondition();
     //clone
     public abstract HeatTransferEquation clone();
 }

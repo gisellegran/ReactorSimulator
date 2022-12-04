@@ -11,6 +11,10 @@ public class CounterCurrent extends HeatExchanger {
         super(source);
     }
 
+    public HeatTransferCondition getHeatTransferCondition(){
+        return this.condition;
+    };
+
     public CounterCurrent clone(){
         return new CounterCurrent(this);
     }
