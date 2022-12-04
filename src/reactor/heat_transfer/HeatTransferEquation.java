@@ -9,6 +9,7 @@ import reactor.Stream;
 //maybe rename to tubular
 public abstract class HeatTransferEquation{
 
+    public static HeatTransferCondition condition;
     private double Ta0; //ambiant temperature
 
     private double U;//overall heat transfer coefficient

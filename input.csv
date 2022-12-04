@@ -11,6 +11,11 @@ A
 100,0
 elementary
 
+Inlet
+
+120
+mol flows
+15,15,0
 
 Reactor
 pfr
@@ -18,15 +23,7 @@ pfr
 ONE_INCH
 isothermal
 isobaric
-
-Inlet
-
-120
-mol flows
-15,15,0
-
-Problem
-delX, numIterations
+performance
 
 
 

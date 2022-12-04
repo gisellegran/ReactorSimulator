@@ -6,11 +6,15 @@ import reactor.pressure_drop.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Scanner;
 
 public class RealDriver {
     //takes comma delimited line and converts to array of doubles
+
+    private static double delX = 0.01;
+    private static int maxIt = 500000;
     private static double[] stringToDoubleArray(String s){
         String[] strArr = s.split(",");
         double[] doubleArr = new double[strArr.length];
@@ -186,7 +190,12 @@ public class RealDriver {
 
         return null;
     }
-    public void writeData(FileOutputStream destination){
+
+    public static void writeData(FileOutputStream destination, Reactor reactor, Stream outlet){
+        PrintWriter outputStream = new PrintWriter(destination);//PrintWriter is buffered, which is more efficient
+        outputStream.println(reactor.toString());
+        outputStream.println("Oulet stream molar flows:"+ outlet.molarFlowRatesToString());
+        outputStream.close();
 
     }
 
@@ -405,13 +414,20 @@ public class RealDriver {
             lineScan.close();
 
             //problem type
-            String problem = in.nextLine();//volume or weight
+            String problem = in.nextLine();//
+
+            if(!problem.equalsIgnoreCase("performance") && !problem.equalsIgnoreCase("design")){
+                throw new IllegalArgumentException("invalid problem type");
+            }
+
+
 
             double size = -1;
             Specie desiredS = null;
             Specie undesiredS = null;
             TubularReactor reactor = null;
-            if (problem.equalsIgnoreCase("design")) {
+
+            if (problem.equalsIgnoreCase("performance")) {
                 //reactor size
                 in.reset(); //rest delimiter
                 size = in.nextDouble();//volume or weight
@@ -423,36 +439,32 @@ public class RealDriver {
                 reactor = new PFR(size, pDrop, heatEq, pipeSize);
             }
             else if (reactorType.equals("pbr")) {
-
                 reactor = new PBR(size, pDrop, heatEq, pipeSize, catalyst);
             }
-            else if (problem.equalsIgnoreCase("performance")){
+
+            if (problem.equalsIgnoreCase("design")) {
                 String toMaximize = in.next();
                 String desiredName = in.next(); //get name of desired specie
                 desiredS = getSpecieFromName(desiredName, species);
-                if (toMaximize.equalsIgnoreCase("selectivity")) {
+                if (toMaximize.equalsIgnoreCase("flow")) {
+                    PFRDesigner designer = new PFRDesigner(reactor);
+                    reactor = designer.returnReactorForMaxFlow(desiredS, inlet, rxnSet, delX, maxIt);
+                } else if (toMaximize.equalsIgnoreCase("selectivity")) {
                     String undesiredName = in.next();
                     undesiredS = getSpecieFromName(undesiredName, species);
-                    PFRDesigner new designer
-                    reactor =
+                    PFRDesigner designer = new PFRDesigner(reactor);
+                    reactor = designer.returnReactorForMaxSelectivity(desiredS, undesiredS, inlet, rxnSet, delX, maxIt);
+                } else {
+                    //todo: throw error
                 }
             }
-            else {
-                throw new
-            }
 
-
-
-
-            in.nextLine();//advance cursor to next line
-
-
-
-
+            in.close();//advance cursor to next line
 
             Stream outlet = reactor.returnReactorOutput(inlet, rxnSet, 0.01, 1000000 );
-            System.out.println("Calculated Molar Flowrates of all the species: " +doubleArrayToString(species, outlet.getAllFlowRates()));
-            System.out.println();
+
+            FileOutputStream output = new FileOutputStream("output.txt");
+            writeData(output, reactor, outlet);
 
             //running the problem
 

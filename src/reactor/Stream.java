@@ -2,6 +2,8 @@ package reactor;
 
 import chemistry.*;
 
+import java.text.DecimalFormat;
+
 //FIXME: for new map classes
 
 
@@ -133,9 +135,31 @@ public class Stream extends MultiComponentMixture{
         return new Stream(this);
     }
 
+    public static String doubleArrayToString(Specie[] s, double[] array){
+        DecimalFormat df = new DecimalFormat("0.000");
+        String str = "";
+        for (int i = 0; i < array.length; i++) {
+            str += (s[i].getName()+": "+df.format(array[i]));
+            if (i < array.length-1) str += ", ";
+        }
+        return "{ "+str+" }";
+    }
+
     //toString
+    //todo: maybe remove
+    /*
     public String toString(){
+        String str = "Total molar flow rate: "+this.molarFlowRate;
+        Specie[] species = this.getSpecies();
+        str += "Component molar flow rate: "+this.molarFlowRate;
+
         return super.toString()+"\n Molar flow rate: "+this.molarFlowRate+"\n Volumetric flow rate: "+this.volFlowRate;
+    }*/
+
+    public String molarFlowRatesToString(){
+        Specie[] species = this.getSpecies();
+        String str = "Component molar flow rate: "+this.doubleArrayToString(species, this.getAllFlowRates());
+        return str;
     }
     //equals
     public boolean equals(Object obj) {

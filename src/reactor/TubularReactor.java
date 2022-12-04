@@ -219,5 +219,9 @@ public abstract class TubularReactor extends Reactor {
 
     //clone
     public abstract TubularReactor clone();
+
+    public String toString(){
+        return super.toString()+"\nPipeSize :"+this.pipeSize;
+    }
     //equals
 }

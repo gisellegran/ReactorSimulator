@@ -24,6 +24,11 @@ public class PFR extends TubularReactor {
     public double returnA(){
        return 4/pipeSize.returnInnerDiameter();}
 
+    public String toString(){
+        String str = "Reactor type: PFR\n";
+        str+= super.toString();
+        return str;
+    }
     //clone
     public PFR clone() {
         return new PFR(this);

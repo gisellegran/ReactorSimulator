@@ -2,7 +2,7 @@ package reactor.heat_transfer;
 
 public class CounterCurrent extends HeatExchanger {
 
-    private static HeatTransferCondition condition = HeatTransferCondition.COUNTERCURRENT;
+    private static final HeatTransferCondition condition = HeatTransferCondition.COUNTERCURRENT;
 
     public CounterCurrent(double U, double Ta0, double m, double Cp){
         super(U, Ta0, m, Cp);

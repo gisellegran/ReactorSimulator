@@ -7,6 +7,7 @@ public abstract class PressureDropEquation{
 
 
     //instance variables
+    public static PressureDropCondition condition;
 
     //constructor
     public PressureDropEquation() {}

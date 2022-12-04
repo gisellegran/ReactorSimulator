@@ -5,7 +5,7 @@ import reactor.Stream;
 
 public class Adiabatic extends HeatTransferEquation{
 
-    private static HeatTransferCondition condition = HeatTransferCondition.ADIABATIC;
+    private static final HeatTransferCondition condition = HeatTransferCondition.ADIABATIC;
     //default pipe size if one inch
     public Adiabatic(){
         super(0., 0.);

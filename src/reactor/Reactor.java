@@ -97,8 +97,15 @@ public abstract class Reactor implements SetOfODEs {
     //clone
     public abstract Reactor clone();
 
-    //equals
+    //string
+    public String toString(){
+        String str = "size: "+ this.size;
+        str += "\npressure drop: "+pDrop.condition;
+        str += "\nheat transfer: "+heatX.condition;
+        return str;
+    }
 
+    //equals
     public boolean equals(Object obj) {
         //check for null
 

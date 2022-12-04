@@ -4,7 +4,7 @@ import reactor.NominalPipeSizes;
 
 public class CoCurrent extends HeatExchanger {
 
-    private static HeatTransferCondition condition = HeatTransferCondition.COCURRENT;
+    private static final HeatTransferCondition condition = HeatTransferCondition.COCURRENT;
 
     public CoCurrent(double U, double Ta0, double m, double Cp){
         super(U, Ta0, m, Cp);

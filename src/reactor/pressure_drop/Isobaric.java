@@ -5,6 +5,7 @@ import reactor.Stream;
 
 public class Isobaric extends PressureDropEquation{
 
+    public static final PressureDropCondition condition = PressureDropCondition.ISOBARIC;
     public Isobaric() {}
 
     //copy constructor

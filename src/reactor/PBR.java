@@ -29,6 +29,13 @@ public class PBR extends TubularReactor {
         return (4/this.pipeSize.returnInnerDiameter())/this.catalyst.returnBulkDensity();
     }
 
+    //toString
+    public String toString(){
+        String str = "Reactor type: PBR\n";
+        str+= super.toString();
+        //todo: add catalyst to string
+        return str;
+    }
     //clone
     public PBR clone() {
         return new PBR(this);

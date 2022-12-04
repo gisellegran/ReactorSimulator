@@ -8,6 +8,8 @@ import java.io.PipedInputStream;
 
 public class ErgunPDrop extends PressureDropEquation{
 
+    public static final PressureDropCondition condition = PressureDropCondition.ERGUN_CORRELATION;
+
     //global variables
     private Stream s0;
     private Stream s;

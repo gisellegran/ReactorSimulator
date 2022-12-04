@@ -269,8 +269,9 @@ public abstract class MultiComponentMixture {
 
 
     //toString
-    //TODO: probably remove
-    /*public String toString(){
+    //todo: maybe remove
+    /*
+    public String toString(){
         return composition.toString()+"\n Viscocity: "+this.viscosity+" | T: "+this.T+" | P: "+this.P;
     }*/
     //equals

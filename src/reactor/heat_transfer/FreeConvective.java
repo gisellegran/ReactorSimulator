@@ -4,7 +4,7 @@ import reactor.NominalPipeSizes;
 
 public class FreeConvective extends HeatTransferEquation{
 
-    private static HeatTransferCondition condition = HeatTransferCondition.FREE_CONVECTIVE;
+    private static final HeatTransferCondition condition = HeatTransferCondition.FREE_CONVECTIVE;
 
     public FreeConvective(double U, double Ta0, NominalPipeSizes pipeSize){
         super(U, Ta0);
