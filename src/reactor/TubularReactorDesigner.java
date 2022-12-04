@@ -71,7 +71,7 @@ public abstract class TubularReactorDesigner implements SetOfODEs{
 
         //TODO: fix
     /*
-        public TubularReactor returnVForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns,
+        public TubularReactor returnReactorForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns,
                                         PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize, double delX, int maxIt){
             setGlobalVariables(rxns, input, pDrop, heatX);
 

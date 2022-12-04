@@ -187,7 +187,7 @@ public class Tests {/*
         MolarFlowMap flowMap = new MolarFlowMap(species, initialFlowRates);
         Stream stream = StreamBuilder.buildStream(flowMap, T, P, viscocity, volFlowRate);
         PFRDesigner designer = new PFRDesigner();
-        PFR output = designer.returnVForTargetFlow(specieA, 8.183165641,stream, rxns, pDrop, heatX, 2, 50000);
+        PFR output = designer.returnReactorForTargetFlow(specieA, 8.183165641,stream, rxns, pDrop, heatX, 2, 50000);
         System.out.println("Rector size found:"+output.getSize());
         //System.out.println(TubularReactor.returnConversion(specieA, stream, output));
     }
@@ -294,7 +294,7 @@ public class Tests {/*
         MolarFlowMap flowMap = new MolarFlowMap(species, initialFlowRates);
         Stream stream = StreamBuilder.buildStream(flowMap, T, P, viscocity, volFlowRate);
         PFRDesigner designer = new PFRDesigner();
-        PFR output = designer.returnVForTargetFlow(specieA, 8.183165641,stream, rxns, pDrop, heatX, 10, 5000);
+        PFR output = designer.returnReactorForTargetFlow(specieA, 8.183165641,stream, rxns, pDrop, heatX, 10, 5000);
         System.out.println(output.getSize());
         //System.out.println(TubularReactor.returnConversion(specieA, stream, output));
 

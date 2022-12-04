@@ -30,8 +30,8 @@ public abstract class Reactor implements SetOfODEs {
     //copy constructor
     public Reactor(Reactor source) {
         this.size = source.size;
-        this.pDrop = pDrop.clone();
-        this.heatX = heatX.clone();
+        this.pDrop = source.pDrop.clone();
+        this.heatX = source.heatX.clone();
     }
 
     //global variables handler

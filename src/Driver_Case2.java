@@ -66,7 +66,7 @@ public class Driver_Case2 {/*
         ErgunPDrop pDrop = new ErgunPDrop(catalyst, pipeSize);
 
         PBRDesigner designer = new PBRDesigner();
-        PBR pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
+        PBR pbr = designer.returnReactorForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         double initialSize = pbr.getSize();
 
         //analyze P effect
@@ -75,7 +75,7 @@ public class Driver_Case2 {/*
             initialSize = pbr.getSize();
             P = P + 0.5;
             inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
-            pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
+            pbr = designer.returnReactorForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(P <= 12.5 && pbr.getSize() <= initialSize);
 
         //analyze T effect
@@ -83,7 +83,7 @@ public class Driver_Case2 {/*
             initialSize = pbr.getSize();
             T = T + 10;
             inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
-            pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
+            pbr = designer.returnReactorForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(T <= 520 && pbr.getSize() < initialSize);
 
         //analyze inlet flowrates
@@ -92,7 +92,7 @@ public class Driver_Case2 {/*
             molarFlows[0] = molarFlows[0] + 5;
             molarFlowMap = new MolarFlowMap(species,molarFlows);
             inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
-            pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
+            pbr = designer.returnReactorForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(pbr.getSize() < initialSize);
 
         do {
@@ -100,7 +100,7 @@ public class Driver_Case2 {/*
             molarFlows[1] = molarFlows[1] + 5;
             molarFlowMap = new MolarFlowMap(species,molarFlows);
             inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
-            pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
+            pbr = designer.returnReactorForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(pbr.getSize() < initialSize);
 
         //TODO: fix this
@@ -110,7 +110,7 @@ public class Driver_Case2 {/*
             molarFlows[2] = molarFlows[2] + 5;
             molarFlowMap = new MolarFlowMap(species,molarFlows);
             inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity,volFlow);
-            pfr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
+            pfr = designer.returnReactorForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(inletStream.returnSpecieMolConcentration(species[2]) <= 0.2*inletStream.returnTotalConcentration() && pfr.returnReactorOutput(species[2]) <= 0.2*inletStream.returnTotalConcentration() && size < );
 
 
@@ -120,7 +120,7 @@ public class Driver_Case2 {/*
             molarFlows[6] = molarFlows[6] + 5;
             molarFlowMap = new MolarFlowMap(species,molarFlows);
             inletStream = StreamBuilder.buildGasStreamFromMolFlows(molarFlowMap,T,P,viscosity);
-            pbr = designer.returnVForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
+            pbr = designer.returnReactorForTargetFlow(species[3],10,inletStream,reactionSet,pDrop, heatX, 1,10000);
         } while(pbr.getSize() < initialSize);
 
         System.out.println("The optimum initial flowrates are: "+inletStream.getAllFlowRates());

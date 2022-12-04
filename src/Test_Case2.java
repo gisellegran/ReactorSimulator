@@ -45,12 +45,12 @@ public class Test_Case2 {
                 "\nTo determine a reactor volume from a given input stream and a desired output flow rate, the reactor designer class is used" +
                 "\nIn this test, values from case 1 will be used. The determined output flow rate of A is used as the target and we are testing to see how " +
                 "\nthe calculated volume compares to the actual known volue of the reactor in case 1");
-        System.out.println("\nWe pass to the PFRDesigner.returnVForTargetFlow() method : species A as our species of interest, the target flow rate of 8.209693911, the known inlet stream, " +
+        System.out.println("\nWe pass to the PFRDesigner.returnReactorForTargetFlow() method : species A as our species of interest, the target flow rate of 8.209693911, the known inlet stream, " +
                 "\nthe reaction set, the pressure drop and heat trasnfer equations along with the step size and maximum number of iterations ");
 
         PFRDesigner designer = new PFRDesigner();
-        PFR output = designer.returnVForTargetFlow(specieA, 8.209693911, stream, rxns, pDrop, heatX, pipeSize, 2, 50000);
-
+       // PFR output = designer.returnReactorForTargetFlow(specieA, 8.209693911, stream, rxns, pDrop, heatX, pipeSize, 0.1, 50000);
+        PFR output = designer.returnReactorForMaxFlow(specieC, stream, rxns, pDrop, heatX, pipeSize, 0.1, 50000);
         System.out.println("Rector size found:" + output.getSize());
         System.out.println("Actual reactor size: 600L");
         //System.out.println(TubularReactor.returnConversion(specieA, stream, output));
