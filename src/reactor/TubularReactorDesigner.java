@@ -7,6 +7,10 @@ import reactor.pressure_drop.PressureDropEquation;
 
 public abstract class TubularReactorDesigner implements SetOfODEs{
 
+    //instance variables
+    private PressureDropEquation pDrop;
+    private HeatTransferEquation heatX;
+
         //Global variables
         private Phase phase;
         private ReactionSet rxns; //TODO: not sure about having any of these in the reactor class
@@ -14,9 +18,6 @@ public abstract class TubularReactorDesigner implements SetOfODEs{
         private Stream input;
         private int tIndex; //index of temperature associated position in array
         private int pIndex; //index of pressure associated position in array
-
-        private HeatTransferEquation heatX;
-        private PressureDropEquation pDrop;
 
 
 

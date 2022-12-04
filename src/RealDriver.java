@@ -176,7 +176,16 @@ public class RealDriver {
 
     }
 
+    //return specie object stored in a specie array corresponding to the name
+    private static Specie getSpecieFromName(String name, Specie[] species){
+        for (int i = 0; i < species.length; i++) {
+            if(species[i].getName().equalsIgnoreCase(name)) {
+                return species[i];
+            }
+        }
 
+        return null;
+    }
     public void writeData(FileOutputStream destination){
 
     }
@@ -228,14 +237,8 @@ public class RealDriver {
 
                 //reference specie
                 String refName = in.nextLine();
-                Specie refSpecie = null;
-                //find reference specie
-                for (int i = 0; i < species.length; i++) {
-                    if(species[i].getName().equalsIgnoreCase(refName)) {
-                        refSpecie = species[i];
-                        break;
-                    }
-                }
+                Specie refSpecie = getSpecieFromName(refName, species);
+
 
                 //reference enthalpy
                 RefValue refEnthalpy = getRefEnthalpyFromLine(in.nextLine());
@@ -315,53 +318,6 @@ public class RealDriver {
             in.nextLine(); //skip empty line
             in.nextLine(); //skip line that says reactor
 
-            //reactor type
-            String reactorType = in.nextLine();
-
-            //reactor size
-            double size = in.nextDouble();//volume or weight
-
-            in.nextLine();//advance cursor to next line
-
-            //pipe size
-            NominalPipeSizes pipeSize = NominalPipeSizes.findByName(in.nextLine().strip());
-            if (pipeSize == null) throw new IllegalArgumentException("pipe size not found");
-
-            //heat transfer
-            HeatTransferEquation heatEq = getHeatEqFromLine(in.nextLine());
-
-            //pressure drop
-            Scanner lineScan = new Scanner(in.nextLine());
-            lineScan.useDelimiter(",");
-            PressureDropCondition pDropCondition = PressureDropCondition.findByName(lineScan.next());
-            lineScan.reset(); //reset delimiter
-
-            PressureDropEquation pDrop;
-            Catalyst catalyst = null;
-            //if we have ergun, then get catalyst object form the rest of the line
-            if( pDropCondition == PressureDropCondition.ERGUN_CORRELATION) {
-                //if ergun pressure drop is selected we must have a pbr
-                // TODO:change to different error type?
-                if (reactorType.equals("pfr")) throw new IllegalArgumentException("can't use ergun correlation in pfr");
-
-                catalyst = getCatalystFromLine(lineScan.nextLine());
-                pDrop = new ErgunPDrop(catalyst, pipeSize);
-
-            } else { pDrop = new Isobaric(); }
-
-            lineScan.close();
-
-            //reactor
-            TubularReactor reactor = null;
-
-            if (reactorType.equals("pfr")) {
-                reactor = new PFR(size, pDrop, heatEq, pipeSize);
-            }
-            else if (reactorType.equals("pbr")) {
-
-                reactor = new PBR(size, pDrop, heatEq, pipeSize, catalyst);
-            }
-
             //inlet stream
             in.nextLine(); //skip empty line
             in.nextLine(); //skip line that says inlet
@@ -369,7 +325,7 @@ public class RealDriver {
             Stream inlet = null;
             double T, P, viscosity;
             double volFlowRate = -1.;
-            lineScan = new Scanner(in.nextLine());
+            Scanner lineScan = new Scanner(in.nextLine());
             lineScan.useDelimiter(",|\n");
             if (lineScan.hasNextDouble()) T = lineScan.nextDouble();
             else T = 298.;//default value
@@ -416,6 +372,83 @@ public class RealDriver {
                 }
 
             }
+
+            //reactor type
+            String reactorType = in.nextLine();
+
+            //pipe size
+            NominalPipeSizes pipeSize = NominalPipeSizes.findByName(in.nextLine().strip());
+            if (pipeSize == null) throw new IllegalArgumentException("pipe size not found");
+
+            //heat transfer
+            HeatTransferEquation heatEq = getHeatEqFromLine(in.nextLine());
+
+            //pressure drop
+            lineScan = new Scanner(in.nextLine());
+            lineScan.useDelimiter(",");
+            PressureDropCondition pDropCondition = PressureDropCondition.findByName(lineScan.next());
+            lineScan.reset(); //reset delimiter
+
+            PressureDropEquation pDrop;
+            Catalyst catalyst = null;
+            //if we have ergun, then get catalyst object form the rest of the line
+            if( pDropCondition == PressureDropCondition.ERGUN_CORRELATION) {
+                //if ergun pressure drop is selected we must have a pbr
+                // TODO:change to different error type?
+                if (reactorType.equals("pfr")) throw new IllegalArgumentException("can't use ergun correlation in pfr");
+
+                catalyst = getCatalystFromLine(lineScan.nextLine());
+                pDrop = new ErgunPDrop(catalyst, pipeSize);
+
+            } else { pDrop = new Isobaric(); }
+
+            lineScan.close();
+
+            //problem type
+            String problem = in.nextLine();//volume or weight
+
+            double size = -1;
+            Specie desiredS = null;
+            Specie undesiredS = null;
+            TubularReactor reactor = null;
+            if (problem.equalsIgnoreCase("design")) {
+                //reactor size
+                in.reset(); //rest delimiter
+                size = in.nextDouble();//volume or weight
+            }
+
+            //reactor
+
+            if (reactorType.equals("pfr")) {
+                reactor = new PFR(size, pDrop, heatEq, pipeSize);
+            }
+            else if (reactorType.equals("pbr")) {
+
+                reactor = new PBR(size, pDrop, heatEq, pipeSize, catalyst);
+            }
+            else if (problem.equalsIgnoreCase("performance")){
+                String toMaximize = in.next();
+                String desiredName = in.next(); //get name of desired specie
+                desiredS = getSpecieFromName(desiredName, species);
+                if (toMaximize.equalsIgnoreCase("selectivity")) {
+                    String undesiredName = in.next();
+                    undesiredS = getSpecieFromName(undesiredName, species);
+                    PFRDesigner new designer
+                    reactor =
+                }
+            }
+            else {
+                throw new
+            }
+
+
+
+
+            in.nextLine();//advance cursor to next line
+
+
+
+
 
             Stream outlet = reactor.returnReactorOutput(inlet, rxnSet, 0.01, 1000000 );
             System.out.println("Calculated Molar Flowrates of all the species: " +doubleArrayToString(species, outlet.getAllFlowRates()));

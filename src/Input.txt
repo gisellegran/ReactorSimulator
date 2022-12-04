@@ -2,7 +2,6 @@ species list
 phase list // l for liquid, g for ideal gas
 number of reactions
 {
-phase
 stoichiometric coefficients list
 reference Specie
 reference enthalpy, reference temperature //optional
@@ -14,18 +13,20 @@ backwards order //if not elementary and is reversible, otherwise skip line (do n
 keq if reversible //if not reversible, skip line(do not leave blank) if not
 } for each reaction
 
-reactor type
-size
-pipe size //must be written in enum way
-heat transfer condition, U,Ta,m,Cp //must be written in enum way, include other infor if needed
-pressure drop condition, diameter, voidfrac, density //must be written in enum way , includeother info if needed
 
 inlet stream
 T, P, v // leave line blank to use the default values
 volFlow //if its a liquid stream
 mol fractions or mol flows
 total mol flow if mol fractions are given
-design problem
+
+reactor type
+size
+pipe size //must be written in enum way
+heat transfer condition, U,Ta,m,Cp //must be written in enum way, include other infor if needed
+pressure drop condition, diameter, voidfrac, density //must be written in enum way , includeother info if needed
+
+
 
 
 

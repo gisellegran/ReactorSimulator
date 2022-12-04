@@ -12,6 +12,11 @@ public class PFRDesigner implements NonLinearEquation {
 
     public static final double vMax = 1000; //max size of a reactor is 500m3
 
+    //instance variables
+    private PressureDropEquation pDrop;
+    private HeatTransferEquation heatEq;
+    private NominalPipeSizes pipeSize;
+
     //Global variables
     private Specie g_desiredSpecie;
     private Specie g_undesiredSpecie;
@@ -26,19 +31,30 @@ public class PFRDesigner implements NonLinearEquation {
     private String g_toMaximize;
 
 
-    public PFRDesigner(){
+    public PFRDesigner(PressureDropEquation pDrop, HeatTransferEquation heatEq, NominalPipeSizes pipeSize){
+        this.pDrop = pDrop.clone();
+        this.heatEq = heatEq.clone();
+        this.pipeSize = pipeSize;
         resetGlobalVariables();
     }
 
-    private void setGlobalVariables(Specie desiredSpecie,Specie undesiredSpecie, double targetF, String toMaximize,
-                                    ReactionSet rxns, Stream input, PressureDropEquation pDrop, HeatTransferEquation heatEq, NominalPipeSizes pipeSize, double delX, int maxIt){
+    public PFRDesigner(PFRDesigner source){
+        this.pDrop = source.pDrop.clone();
+        this.heatEq = source.heatEq.clone();
+        this.pipeSize = source.pipeSize;
+        resetGlobalVariables();
+    }
+
+
+    private void setGlobalVariables(Specie desiredSpecie, Specie undesiredSpecie, double targetF, String toMaximize,
+                                    ReactionSet rxns, Stream input, double delX, int maxIt){
         this.g_desiredSpecie = desiredSpecie;
         this.g_undesiredSpecie = undesiredSpecie;
         this.g_targetF = targetF;
         this.g_toMaximize = toMaximize;
         this.g_rxns = rxns;
         this.g_input = input;
-        this.g_reactor = new PFR(0., pDrop, heatEq, pipeSize);
+        this.g_reactor = new PFR(0., this.pDrop, this.heatEq, this.pipeSize);
         this.g_delX = delX;
         this.g_maxIt = maxIt;
     }
@@ -58,16 +74,15 @@ public class PFRDesigner implements NonLinearEquation {
 
 
     public PFR returnReactorForTargetConversion(Specie targetS, double targetX, Stream input, ReactionSet rxns,
-                                                PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize, double delX, int maxIt){
+                                                double delX, int maxIt){
         //convert conversion to target flow rate
         double targetF =  input.returnSpecieFlowRate(targetS)*(1-targetX);
-        return returnReactorForTargetFlow( targetS, targetF, input, rxns, pDrop, heatX, pipeSize, delX, maxIt);
+        return returnReactorForTargetFlow( targetS, targetF, input, rxns, delX, maxIt);
 
     }
 
-    public PFR returnReactorForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns,
-                                          PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize, double delX, int maxIt){
-        setGlobalVariables(s, null, targetF, null, rxns, input, pDrop, heatX, pipeSize, delX, maxIt);
+    public PFR returnReactorForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns, double delX, int maxIt){
+        setGlobalVariables(s, null, targetF, null, rxns, input, pipeSize, delX, maxIt);
         double v = RootFinder.findRoot(0., this.vMax, 0.0005, 500000, this);
         PFR result =g_reactor.clone();
         result.setSize(v);
@@ -76,9 +91,8 @@ public class PFRDesigner implements NonLinearEquation {
         return result;
     }
 
-    public PFR returnReactorForMaxFlow(Specie s, Stream input, ReactionSet rxns,
-                                       PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize, double delX, int maxIt){
-        setGlobalVariables(s, null, -1., "flow", rxns, input, pDrop, heatX, pipeSize, delX, maxIt);
+    public PFR returnReactorForMaxFlow(Specie s, Stream input, ReactionSet rxns, double delX, int maxIt){
+        setGlobalVariables(s, null, -1., "flow", rxns, input, delX, maxIt);
         double v = GoldenSectionSearch.search(0., this.vMax, 0.0005,  this);
         PFR result =g_reactor.clone();
         result.setSize(v);
@@ -87,9 +101,8 @@ public class PFRDesigner implements NonLinearEquation {
         return result;
     }
 
-    public PFR returnReactorForMaxSelectivity(Specie s_desired, Specie s_undesired, Stream input, ReactionSet rxns,
-                                       PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize, double delX, int maxIt){
-        setGlobalVariables(s_desired, null, -1., "selectivity", rxns, input, pDrop, heatX, pipeSize, delX, maxIt);
+    public PFR returnReactorForMaxSelectivity(Specie s_desired, Specie s_undesired, Stream input, ReactionSet rxns, double delX, int maxIt){
+        setGlobalVariables(s_desired, null, -1., "selectivity", rxns, input, delX, maxIt);
         double v = GoldenSectionSearch.search(0., this.vMax, 0.0005,  this);
         PFR result =g_reactor.clone();
         result.setSize(v);
