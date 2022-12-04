@@ -1,0 +1,33 @@
+Species
+A,B,C
+L,L,L
+
+Reactions
+1
+Reaction 1
+-1,-2,1
+A
+
+100,0
+elementary
+
+
+Reactor
+pfr
+600
+ONE_INCH
+isothermal
+isobaric
+
+Inlet
+
+120
+mol flows
+15,15,0
+
+Problem
+delX, numIterations
+
+
+
+

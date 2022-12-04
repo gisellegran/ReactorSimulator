@@ -25,12 +25,12 @@ public class Test_Case2 {
         double[] orders = {1., 2., 0.};
         RateLaw rate = new PowerRateLaw(kA, specieA, orders);
 
-        Reaction rxn = new Reaction(rate, species, stoichCoeffs, refEnthalpy);
+        Reaction rxn = new Reaction(species, stoichCoeffs, rate, refEnthalpy, Phase.LIQUID);
 
         PressureDropEquation pDrop = new Isobaric();
         NominalPipeSizes pipeSize = NominalPipeSizes.ONE_INCH; //default
         HeatTransferCondition condition = HeatTransferCondition.ISOTHERMAL;
-        HeatTransferEquation heatX = new Isothermal(0, 0, pipeSize);
+        HeatTransferEquation heatX = new Isothermal();
 
         ReactionSet rxns = new ReactionSet(rxn);
 

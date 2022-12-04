@@ -1,14 +1,14 @@
 package reactor.heat_transfer;
 
 import chemistry.ReactionSet;
-import reactor.NominalPipeSizes;
 import reactor.Stream;
 
 public class Isothermal extends HeatTransferEquation{
 
     private static HeatTransferCondition condition = HeatTransferCondition.ISOTHERMAL;
-    public Isothermal(NominalPipeSizes pipeSize){
-        super(0., 0., pipeSize);
+    //default pipe size if one inch
+    public Isothermal(){
+        super(0., 0.);
     }
     public Isothermal(Isothermal source){
         super(source);

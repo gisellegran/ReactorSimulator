@@ -138,7 +138,7 @@ public class PBRDesigner extends TubularReactorDesigner {
         }
 
         NominalPipeSizes pipeSize = NominalPipeSizes.ONE_INCH;
-        PBR result = new PBR(xf, pDrop, heatX, pipeSize);
+        PBR result = new PBR(xf, pDrop, heatX, pipeSize, null);
         resetGlobalVariables();
 
         //generate stream

@@ -16,7 +16,7 @@ public class Stream extends MultiComponentMixture{
     public Stream(Specie[] species, double[] molComposition, double T, double P,
                   double viscocity, double volFlowRate, double molarFlowRate ){
         //TODO do we want to take phase as an input? im not sure
-        super(species, molComposition, viscocity, T, P);
+        super(species, molComposition, T, P, viscocity);
         this.volFlowRate = volFlowRate;
         this.molarFlowRate = molarFlowRate;
 

@@ -40,14 +40,14 @@ public class Test_Case1 {
         System.out.println("Reference Enthalpy Creation Completed");
 
         System.out.println("Finally, the rate law, stoichiometry map and reaction enthalpy are combined to build a reaction object." );
-        Reaction rxn = new Reaction(refReactionRate, species, stoichCoeff, refEnthalpy);
+        Reaction rxn = new Reaction(species, stoichCoeff, refReactionRate, refEnthalpy, phase);
         System.out.println("Reaction Creation Completed");
 
         System.out.println("Now the reactor object will be built. " +
                 "\nThe reactor is isothermal and isobaric so the corresponding heat transfer and pressure drop equation objects are created.");
         NominalPipeSizes pipeSize = NominalPipeSizes.ONE_INCH; //default
         HeatTransferCondition condition = HeatTransferCondition.ISOTHERMAL;
-        HeatTransferEquation heatTransferEquation = new Isothermal(0, 0, pipeSize);
+        HeatTransferEquation heatTransferEquation = new Isothermal();
         PressureDropEquation pDrop = new Isobaric();
 
         System.out.println("Pressure Drop and Heat Transfer Equation Creation Completed");

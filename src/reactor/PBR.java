@@ -9,13 +9,16 @@ public class PBR extends TubularReactor {
     private Catalyst catalyst;
 
     //main constructor
-    public PBR(double weight, PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize) {
+    public PBR(double weight, PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize, Catalyst catalyst) {
         super(weight, pDrop, heatX, pipeSize);
+        if (catalyst == null) throw new IllegalArgumentException("catalyst is null");
+        this.catalyst = catalyst.clone();
     }
 
     //copy constructor
     public PBR(PBR source){
         super(source);
+        this.catalyst = source.catalyst.clone();
     }
     //accessors
     //mutators

@@ -9,6 +9,15 @@ public enum Phase {
     }
     Phase result = null; //TODO: error handling?
 
+    switch (id.toLowerCase()){
+      case "l":
+        id = "liquid";
+        break;
+      case "g":
+        id = "idealgas";
+        break;
+    }
+
     for (Phase elem : values()) {
       if (elem.name().equalsIgnoreCase(id)) {
         result = elem;

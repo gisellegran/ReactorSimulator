@@ -2,9 +2,10 @@ package reactor;
 
 import chemistry.*;
 import numericalmethods.Euler;
+import reactor.heat_transfer.FreeConvective;
 import reactor.heat_transfer.HeatTransferCondition;
 import reactor.heat_transfer.HeatTransferEquation;
-import reactor.heat_transfer.NonAdiabatic;
+import reactor.heat_transfer.HeatExchanger;
 import reactor.pressure_drop.PressureDropEquation;
 
 public abstract class TubularReactor extends Reactor {
@@ -19,9 +20,9 @@ public abstract class TubularReactor extends Reactor {
     private Specie[] g_speciesInReactor; //TODO try to remove
     private Stream g_inputStream;
 
-    private int g_Tindex; //index of temperature  in array
-    private int g_Pindex; //index of pressure  in array
 
+    private int g_Pindex; //index of pressure  in array
+    private int g_Tindex; //index of temperature  in array
     private int g_TaIndex; //index of ambient temperature in array (temperature outside reactor)
     private double g_a; //heat transfer area per unit volume
     private HeatTransferCondition g_heatCondition;
@@ -46,15 +47,12 @@ public abstract class TubularReactor extends Reactor {
     protected void setGlobalVariables(ReactionSet rxns, Stream input) {
         this.g_phase = input.returnPhase();
         this.g_reactions = rxns.clone();
-        MultiComponentMixture temp = input.clone();
-        temp.addAllSpecies(rxns.returnSpecies());
-        this.g_speciesInReactor = temp.getSpecies();
+        this.g_speciesInReactor = input.getSpecies();
         this.g_inputStream = input.clone();
         this.g_Pindex = this.g_speciesInReactor.length;
         this.g_Tindex = this.g_speciesInReactor.length+1;
-        this.g_heatCondition = this.getHeatX().getHeatTransferCondition();
         //we only need to consider Ta when we are in non adiabatic non isothermal conditions
-        if (g_heatCondition != HeatTransferCondition.ADIABATIC && g_heatCondition != HeatTransferCondition.ISOTHERMAL) {
+        if (this.getHeatX() instanceof HeatExchanger || this.getHeatX() instanceof FreeConvective) {
             this.g_TaIndex = this.g_speciesInReactor.length+2;//index of Ta
             this.g_Ta = this.getHeatX().getTa0(); //ambiant temperature
         }
@@ -69,6 +67,7 @@ public abstract class TubularReactor extends Reactor {
         this.g_inputStream = null;
         this.g_Tindex = -1;
         this.g_Pindex = -1;
+        this.g_TaIndex = -1;
         this.g_a = -1;
     }
 
@@ -140,13 +139,6 @@ public abstract class TubularReactor extends Reactor {
         return result;
     }
 
-    protected double returnPDrop(Stream s) {
-        return super.getpDrop().calculateValue(s);
-    }
-    protected double returnHeatX(Stream s) {
-        return super.getHeatX().calculateDelT(this.g_a, s, this.g_reactions);
-    }
-
     public abstract double returnA();
 
     //takes numerical methods output and converts it to g_a stream
@@ -171,7 +163,7 @@ public abstract class TubularReactor extends Reactor {
         viscocity = g_inputStream.getViscosity();
 
         //put flow rates in an array
-        double[] flowRates = new double[tempY.length-2];
+        double[] flowRates = new double[this.g_speciesInReactor.length];
 
         for (int i = 0; i < flowRates.length; i++) { flowRates[i] = y[i]; }
 
@@ -198,7 +190,7 @@ public abstract class TubularReactor extends Reactor {
         dely[this.g_Pindex] = this.getpDrop().calculateValue(currentOutput);
         dely[this.g_Tindex] = this.getHeatX().calculateDelT(g_a, currentOutput, g_reactions);
 
-        if (!(g_TaIndex<0)) dely[this.g_TaIndex] = ((NonAdiabatic)this.getHeatX()).calculateDelTa(this.g_a, y[g_TaIndex], currentOutput.getT());//calculate delTa if in heat transfer conditions
+        if (!(g_TaIndex<0)) dely[this.g_TaIndex] = ((HeatExchanger)this.getHeatX()).calculateDelTa(this.g_a, y[g_TaIndex], currentOutput.getT());//calculate delTa if in heat transfer conditions
 
         double[] rates = this.g_reactions.returnNetRxnRates(currentOutput);
         for (int i = 0; i < this.g_speciesInReactor.length; i++) {

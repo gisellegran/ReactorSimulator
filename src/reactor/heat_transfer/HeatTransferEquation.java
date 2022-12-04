@@ -4,34 +4,25 @@ import chemistry.MultiComponentMixture;
 import chemistry.Reaction;
 import chemistry.ReactionSet;
 import chemistry.Specie;
-import reactor.NominalPipeSizes;
 import reactor.Stream;
 
 //maybe rename to tubular
 public abstract class HeatTransferEquation{
 
-    private static HeatTransferCondition condition;
-
     private double Ta0; //ambiant temperature
 
     private double U;//overall heat transfer coefficient
 
-    private NominalPipeSizes pipeSize;//size of reactor pipe
-
     //main constructor
-    public HeatTransferEquation(double U, double Ta, NominalPipeSizes pipeSize){
-        if (pipeSize == null) throw new IllegalArgumentException("null pipe size");
-
+    public HeatTransferEquation(double U, double Ta){
         this.U = U;
         this.Ta0 = Ta;
-        this.pipeSize = pipeSize;
     }
     //copy constructor
     public HeatTransferEquation(HeatTransferEquation source){
         if (source == null) throw new IllegalArgumentException("null source");
         this.U = source.U;
         this.Ta0 = source.Ta0;
-        this.pipeSize = source.pipeSize;
     }
 
     public boolean setTa(double Ta) {
@@ -78,8 +69,6 @@ public abstract class HeatTransferEquation{
         return this.U*a*(T-this.Ta0);
     }
 
-
-
     //a = heat exchange area per unit volume
     //rdelH = heat generated
     //ua(T-Ta0) = heat removed
@@ -87,9 +76,6 @@ public abstract class HeatTransferEquation{
         double T = s.getT();
         return (this.returnHeatGenerated(rxns, s)-this.returnHeatRemoved(a, T))/this.returnTotalFCp(s);
     }
-    public HeatTransferCondition getHeatTransferCondition(){
-        return this.condition;
-    };
     //clone
     public abstract HeatTransferEquation clone();
 }

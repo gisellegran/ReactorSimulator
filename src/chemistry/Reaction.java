@@ -3,22 +3,24 @@ package chemistry;
 import static chemistry.RateConstant.R;
 
 public class Reaction {
-    private RateLaw refReactionRate;
+
     private Specie[] species;
     private double[] stoichiometry;
-
+    private RateLaw refReactionRate;
     private RefValue refEnthalpy;
+    private Phase phase;
 
-    //globabl variables
+    //global variables
     int g_refI; // reference species index
 
     //constructor
-    public Reaction (RateLaw refReactionRate, Specie[] species, double[] stoichiometry, RefValue refEnthalpy)
+    public Reaction (Specie[] species, double[] stoichiometry, RateLaw refReactionRate, RefValue refEnthalpy, Phase phase)
     {
         //TODO; error handling
         if(refReactionRate==null) System.exit(0);
         if(stoichiometry==null) System.exit(0);
         if(refEnthalpy==null) System.exit(0);
+        if(phase==null) System.exit(0);
 
         //TODO; throw error if ref species is not in the species list
 
@@ -34,6 +36,7 @@ public class Reaction {
             this.species[i] = species[i];
             this.stoichiometry[i] = stoichiometry[i];
         }
+        this.phase = phase;
         this.refReactionRate = refReactionRate.clone();
         this.refEnthalpy = refEnthalpy.clone();
     }
@@ -50,8 +53,8 @@ public class Reaction {
             this.species[i] = source.species[i];
             this.stoichiometry[i] = source.stoichiometry[i];
         }
+        this.phase = source.phase;
         this.refReactionRate = source.refReactionRate.clone();
-
         this.refEnthalpy = source.refEnthalpy.clone();
     }
 
@@ -86,6 +89,16 @@ public class Reaction {
 
     public boolean setSpecies(){
         // todo: implement
+        return true;
+    }
+
+    public Phase getPhase(){
+        return this.phase;
+    }
+
+    public boolean setPhase(Phase phase){
+        if (phase == null) throw new IllegalArgumentException("phase is null");
+        this.phase = phase;
         return true;
     }
     //mutators

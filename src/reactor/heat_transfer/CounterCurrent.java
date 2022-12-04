@@ -1,13 +1,11 @@
 package reactor.heat_transfer;
 
-import reactor.NominalPipeSizes;
-
-public class CounterCurrent extends NonAdiabatic{
+public class CounterCurrent extends HeatExchanger {
 
     private static HeatTransferCondition condition = HeatTransferCondition.COUNTERCURRENT;
 
-    public CounterCurrent(double U, double Ta0, NominalPipeSizes pipeSize, double m, double Cp){
-        super(U, Ta0, pipeSize, m, Cp);
+    public CounterCurrent(double U, double Ta0, double m, double Cp){
+        super(U, Ta0, m, Cp);
     }
     public CounterCurrent(CounterCurrent source){
         super(source);
