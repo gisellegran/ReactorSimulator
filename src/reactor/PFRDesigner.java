@@ -13,15 +13,12 @@ public class PFRDesigner implements NonLinearEquation {
     public static final double vMax = 1000; //max size of a reactor is 500m3
 
     //instance variables
-    private PressureDropEquation pDrop;
-    private HeatTransferEquation heatEq;
-    private NominalPipeSizes pipeSize;
+    private TubularReactor reactor;
 
     //Global variables
     private Specie g_desiredSpecie;
     private Specie g_undesiredSpecie;
     private double g_targetF;
-    private PFR g_reactor;
     private ReactionSet g_rxns;
     private Stream g_input;
 
@@ -31,17 +28,13 @@ public class PFRDesigner implements NonLinearEquation {
     private String g_toMaximize;
 
 
-    public PFRDesigner(PressureDropEquation pDrop, HeatTransferEquation heatEq, NominalPipeSizes pipeSize){
-        this.pDrop = pDrop.clone();
-        this.heatEq = heatEq.clone();
-        this.pipeSize = pipeSize;
+    public PFRDesigner(TubularReactor reactor){
+        this.reactor = reactor.clone();
         resetGlobalVariables();
     }
 
     public PFRDesigner(PFRDesigner source){
-        this.pDrop = source.pDrop.clone();
-        this.heatEq = source.heatEq.clone();
-        this.pipeSize = source.pipeSize;
+        this.reactor = source.reactor.clone();
         resetGlobalVariables();
     }
 
@@ -54,7 +47,6 @@ public class PFRDesigner implements NonLinearEquation {
         this.g_toMaximize = toMaximize;
         this.g_rxns = rxns;
         this.g_input = input;
-        this.g_reactor = new PFR(0., this.pDrop, this.heatEq, this.pipeSize);
         this.g_delX = delX;
         this.g_maxIt = maxIt;
     }
@@ -66,14 +58,13 @@ public class PFRDesigner implements NonLinearEquation {
         this.g_toMaximize = null;
         this.g_rxns = null;
         this.g_input = null;
-        this.g_reactor = null;
         this.g_delX = -1;
         this.g_maxIt = -1;
 
     }
 
 
-    public PFR returnReactorForTargetConversion(Specie targetS, double targetX, Stream input, ReactionSet rxns,
+    public TubularReactor returnReactorForTargetConversion(Specie targetS, double targetX, Stream input, ReactionSet rxns,
                                                 double delX, int maxIt){
         //convert conversion to target flow rate
         double targetF =  input.returnSpecieFlowRate(targetS)*(1-targetX);
@@ -81,30 +72,30 @@ public class PFRDesigner implements NonLinearEquation {
 
     }
 
-    public PFR returnReactorForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns, double delX, int maxIt){
-        setGlobalVariables(s, null, targetF, null, rxns, input, pipeSize, delX, maxIt);
+    public TubularReactor returnReactorForTargetFlow(Specie s, double targetF, Stream input, ReactionSet rxns, double delX, int maxIt){
+        setGlobalVariables(s, null, targetF, null, rxns, input, delX, maxIt);
         double v = RootFinder.findRoot(0., this.vMax, 0.0005, 500000, this);
-        PFR result =g_reactor.clone();
+        TubularReactor result = this.reactor.clone();
         result.setSize(v);
         resetGlobalVariables();
 
         return result;
     }
 
-    public PFR returnReactorForMaxFlow(Specie s, Stream input, ReactionSet rxns, double delX, int maxIt){
+    public TubularReactor returnReactorForMaxFlow(Specie s, Stream input, ReactionSet rxns, double delX, int maxIt){
         setGlobalVariables(s, null, -1., "flow", rxns, input, delX, maxIt);
         double v = GoldenSectionSearch.search(0., this.vMax, 0.0005,  this);
-        PFR result =g_reactor.clone();
+        TubularReactor result = this.reactor.clone();
         result.setSize(v);
         resetGlobalVariables();
 
         return result;
     }
 
-    public PFR returnReactorForMaxSelectivity(Specie s_desired, Specie s_undesired, Stream input, ReactionSet rxns, double delX, int maxIt){
+    public TubularReactor returnReactorForMaxSelectivity(Specie s_desired, Specie s_undesired, Stream input, ReactionSet rxns, double delX, int maxIt){
         setGlobalVariables(s_desired, null, -1., "selectivity", rxns, input, delX, maxIt);
         double v = GoldenSectionSearch.search(0., this.vMax, 0.0005,  this);
-        PFR result =g_reactor.clone();
+        TubularReactor result = this.reactor.clone();
         result.setSize(v);
         resetGlobalVariables();
 
@@ -113,15 +104,15 @@ public class PFRDesigner implements NonLinearEquation {
 
 
     public double returnValue(double x){
-        g_reactor.setSize(x);
-        Stream output = g_reactor.returnReactorOutput(g_input, g_rxns, g_delX, g_maxIt);
+        this.reactor.setSize(x);
+        Stream output = this.reactor.returnReactorOutput(g_input, g_rxns, g_delX, g_maxIt);
         return output.returnSpecieFlowRate(g_desiredSpecie) - this.g_targetF;
     }
 
     public double returnEquationResult(double x){
         double result;
-        g_reactor.setSize(x);
-        Stream output = g_reactor.returnReactorOutput(g_input, g_rxns, g_delX, g_maxIt);
+        this.reactor.setSize(x);
+        Stream output = this.reactor.returnReactorOutput(g_input, g_rxns, g_delX, g_maxIt);
         //default result is flow rate
         result = -output.returnSpecieFlowRate(g_desiredSpecie); //negative because search minimizes
         if (this.g_toMaximize.equalsIgnoreCase("selectivity")) result /= output.returnSpecieFlowRate(g_undesiredSpecie);

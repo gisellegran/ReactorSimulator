@@ -49,8 +49,8 @@ public class Test_Case2 {
                 "\nthe reaction set, the pressure drop and heat trasnfer equations along with the step size and maximum number of iterations ");
 
         PFRDesigner designer = new PFRDesigner();
-       // PFR output = designer.returnReactorForTargetFlow(specieA, 8.209693911, stream, rxns, pDrop, heatX, pipeSize, 0.1, 50000);
-        PFR output = designer.returnReactorForMaxFlow(specieC, stream, rxns, pDrop, heatX, pipeSize, 0.1, 50000);
+       PFR output = designer.returnReactorForTargetFlow(specieA, 8.209693911, stream, rxns, pDrop, heatX, pipeSize, 0.1, 50000);
+        //PFR output = designer.returnReactorForMaxFlow(specieC, stream, rxns, pDrop, heatX, pipeSize, 0.1, 50000);
         System.out.println("Rector size found:" + output.getSize());
         System.out.println("Actual reactor size: 600L");
         //System.out.println(TubularReactor.returnConversion(specieA, stream, output));
