@@ -1,12 +1,10 @@
 package reactor.heat_transfer;
 
-import reactor.NominalPipeSizes;
-
 public class FreeConvective extends HeatTransferEquation{
 
     private static final HeatTransferCondition condition = HeatTransferCondition.FREE_CONVECTIVE;
 
-    public FreeConvective(double U, double Ta0, NominalPipeSizes pipeSize){
+    public FreeConvective(double U, double Ta0){
         super(U, Ta0);
     }
     public FreeConvective(FreeConvective source){
@@ -14,7 +12,7 @@ public class FreeConvective extends HeatTransferEquation{
     }
 
     public HeatTransferCondition getHeatTransferCondition(){
-        return this.condition;
+        return FreeConvective.condition;
     };
     public FreeConvective clone(){
         return new FreeConvective(this);

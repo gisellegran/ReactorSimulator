@@ -8,7 +8,7 @@ import reactor.pressure_drop.PressureDropEquation;
 
 import java.text.DecimalFormat;
 
-public class Test_Case1 {
+public class Test_Case1 {/*
     public static void main(String[] args) {
 
         System.out.println("Creating species objects for A, B, & C..");
@@ -81,7 +81,7 @@ public class Test_Case1 {
 
         System.out.println("Now the PFR can solve the performance problem by calling the returnReactorOutput() method. We pass the inlet stream, reaction set " +
                 "\nalong with step size (0.01) and maximum number of iterations.");
-        Stream outputStream = pfr.returnReactorOutput(inletStream, reactionSet, 0.01, 1000000);
+        //Stream outputStream = pfr.returnReactorOutput(inletStream, reactionSet, 0.01, 1000000);
         System.out.println("We obtain the reactor outlet stream. The results of the test are as follows: ");
         DecimalFormat df = new DecimalFormat("0.00");
         System.out.println("Expected output concentration for the PFR (testFlowReactor()): { A: 8.209693911, B: 1.419387822, C: 6.790306089}");
@@ -100,5 +100,5 @@ public class Test_Case1 {
             str += (s[i].getName()+": "+df.format(array[i])+", ");
         }
         return "{ "+str+" }";
-    }
+    }*/
 }

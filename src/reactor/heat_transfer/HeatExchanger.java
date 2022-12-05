@@ -3,39 +3,31 @@ package reactor.heat_transfer;
 public abstract class HeatExchanger extends HeatTransferEquation{
 
     //instance variables
-    private double m;
-    private double Cp;
+    private Utility utility;
 
-    public boolean setM(double m){
-        if (m < 0) throw new IllegalArgumentException("flow rate cannot be negative");
-        this.m = m;
-        return true;
-    }
-
-    public boolean setCp(double Cp){
-        this.Cp = Cp;
-        return true;
-    }
-    public double getM(){
-        return this.m;
-    }
-
-    public double getCp(){
-        return this.Cp;
-    }
 
     //heat exchange fluid flow rate m
     //heat exchange heat capacity Cp
-    public HeatExchanger(double U, double Ta0, double m, double Cp){
+    public HeatExchanger(double U, double Ta0, Utility utility){
         super(U, Ta0);
-        if (m < 0) throw new IllegalArgumentException("flow rate cannot be negative");
-        this.m = m;
-        this.Cp = Cp;
+        if (utility == null) throw new IllegalArgumentException("null utility");
+        this.utility = utility;
     }
+
+    public boolean setUtility(Utility utility){
+        if (utility == null) throw new IllegalArgumentException("null utility");
+        this.utility = utility;
+        return true;
+    }
+
+    public Utility getUtility(){
+        return this.utility;
+    }
+
+
     public HeatExchanger(HeatExchanger source){
         super(source);
-        this.m = source.m;
-        this.Cp = source.Cp;
+        this.utility = source.utility.clone();
     }
 
     public abstract HeatExchanger clone();

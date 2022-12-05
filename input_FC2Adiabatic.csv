@@ -16,20 +16,24 @@ Reaction 2
 -1,-1,0,0,0,1
 A
 -371090,298
-0.01085,34600
+0.0185,34600
 
 
 0.65,0.57,0,0,0,0
 
 Inlet
-550,1317225
+350,1317225
 mol flows
 0.0027777,0.0027777,0.0027777,0,0,0
 
 Reactor
 pbr
 FIVE_INCHES
-cocurrent,7.87,293,10
+adiabatic
 ergun_correlation,0.005,0.45,833
 performance
-1.504
+0.416
+
+
+
+

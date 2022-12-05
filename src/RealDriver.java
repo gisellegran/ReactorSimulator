@@ -7,13 +7,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.annotation.Target;
 import java.text.DecimalFormat;
 import java.util.Scanner;
 
 public class RealDriver {
     //takes comma delimited line and converts to array of doubles
 
-    private static double delX = 0.05;
+    private static double delX = 0.001;
     private static int maxIt = 500000;
     private static double[] stringToDoubleArray(String s){
         String[] strArr = s.split(",");
@@ -136,22 +137,30 @@ public class RealDriver {
                 lineScan.close();
                 return new Adiabatic();
             }
+            case FREE_CONVECTIVE -> {
+                double U, Ta;
+                if (!lineScan.hasNextDouble()) throw new IllegalArgumentException("missing heat transfer data");
+                U = lineScan.nextDouble();
+                if (!lineScan.hasNextDouble()) throw new IllegalArgumentException("missing heat transfer data");
+                Ta = lineScan.nextDouble();
+                lineScan.close();
+                return new FreeConvective(U, Ta);
+            }
             case COCURRENT, COUNTERCURRENT -> {
-                double U, Ta0, m, Cp;
+                double U, Ta0, m;
                 if (!lineScan.hasNextDouble()) throw new IllegalArgumentException("missing heat transfer data");
                 U = lineScan.nextDouble();
                 if (!lineScan.hasNextDouble()) throw new IllegalArgumentException("missing heat transfer data");
                 Ta0 = lineScan.nextDouble();
                 if (!lineScan.hasNextDouble()) throw new IllegalArgumentException("missing heat transfer data");
                 m = lineScan.nextDouble();
-                if (!lineScan.hasNextDouble()) throw new IllegalArgumentException("missing heat transfer data");
-                Cp = lineScan.nextDouble();
                 lineScan.close();
+                Utility utility = new CoolingWater(m);//cooling water is the only available utility
                 switch (condition) {
                     case COCURRENT:
-                        return new CoCurrent(U, Ta0, m, Cp);
+                        return new CoCurrent(U, Ta0, utility);
                     case COUNTERCURRENT:
-                        return new CounterCurrent(U, Ta0, m, Cp);
+                        return new CounterCurrent(U, Ta0, utility);
                 }
             }
             default -> //TODO: throw error?

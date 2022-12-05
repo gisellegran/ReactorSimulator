@@ -4,15 +4,15 @@ public class CounterCurrent extends HeatExchanger {
 
     private static final HeatTransferCondition condition = HeatTransferCondition.COUNTERCURRENT;
 
-    public CounterCurrent(double U, double Ta0, double m, double Cp){
-        super(U, Ta0, m, Cp);
+    public CounterCurrent(double U, double Ta0, Utility utility){
+        super(U, Ta0, utility);
     }
     public CounterCurrent(CounterCurrent source){
         super(source);
     }
 
     public HeatTransferCondition getHeatTransferCondition(){
-        return this.condition;
+        return CounterCurrent.condition;
     };
 
     public CounterCurrent clone(){
@@ -20,7 +20,7 @@ public class CounterCurrent extends HeatExchanger {
     }
 
     public double calculateDelTa(double a, double Ta, double T){
-        return (this.getU()*a*(Ta-T))/(this.getM()*this.getCp());
+        return (this.getU()*a*(Ta-T))/(this.getUtility().getM()*this.getUtility().returnHeatCapacity(Ta));
     }
 
 

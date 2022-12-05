@@ -10,10 +10,10 @@ public enum Element {
     E("E",18.02, new double[]{33.933,-0.8419,2.9906,-1.7825,3.6934}),
     F("F",44.01, new double[]{27.437,4.2315,-1.9555,0.39968,-0.29872}),
     H("H",34.01, new double[]{25.206,8.04,-6,2,-2}),
-    J("I",32.04, new double[]{15.04,10.39,-3,-0.7,3}),
-    K("J",76.09, new double[]{1.0565,25.85,-20,5,-7}),
-    L("K",62.07, new double[]{24.255,13.76,30,-50,200}),
-    I("L",28.01, new double[]{29.342,-0.3540,1.0076,-0.4312,0.25935});
+    J("J",32.04, new double[]{15.04,10.39,-3,-0.7,3}),
+    K("K",76.09, new double[]{1.0565,25.85,-20,5,-7}),
+    L("L",62.07, new double[]{24.255,13.76,30,-50,200}),
+    I("I",28.01, new double[]{29.342,-0.3540,1.0076,-0.4312,0.25935});
     public final String name;
     public final double molarMass;
     public final double[] heatCapacityCoefficients;

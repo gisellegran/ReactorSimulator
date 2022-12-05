@@ -151,7 +151,7 @@ public class Stream extends MultiComponentMixture{
 
         Specie[] species = this.getSpecies();
         double[] flowRates = this.getAllFlowRates();
-        DecimalFormat df = new DecimalFormat("0.000");
+        DecimalFormat df = new DecimalFormat("0.00000");
         String str = "";
         for (int i = 0; i < species.length; i++) {
             str += (species[i].getName()+": "+df.format(flowRates[i]));

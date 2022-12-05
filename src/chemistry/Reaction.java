@@ -181,19 +181,19 @@ public class Reaction {
         return reactionRates;
     }
 
-    public double calcRefReactionRate(MultiComponentMixture mix){
-        return this.refReactionRate.returnRate(mix);
+    public double calcNormalizedReactionRate(MultiComponentMixture mix){
+        return this.refReactionRate.returnRate(mix)/Math.abs(this.stoichiometry[g_refI]);
     }
 
 
     //used in returnReactionEnthalpy
-    private double returnDeltaC(double T){
+    private double returnDeltaC(double T, double T0){
         double deltaC = 0.;
         //get the absolute value of the reference specie in order to obtain the normalized & generalized stoichiometric coefficients
         double refV = Math.abs(this.stoichiometry[g_refI]);//stoichiometric coefficient of the refference specie of the reaction
 
         for (int i = 0; i < this.species.length; i++) {
-            double Ci = species[i].returnHeatCapacity(T);//species i heat capacity at T
+            double Ci = species[i].returnIntegralHeatCapacity(T0, T);//species i heat capacity at T
             double stoichCoeff = this.stoichiometry[i]; //stoichiometric coefficient of species i
             deltaC += (stoichCoeff/refV)*Ci;// add Cp_i * v_i/|v_ref|
         }
@@ -206,7 +206,7 @@ public class Reaction {
         if (T <= 0 ) {throw new IllegalArgumentException("T is not positive.");}
          //∆H_rx(T) = ∆H_rx(T_R) + ∆C_p*(T-T_R)
          //this is calculated with respect to the reference specie
-        return this.refEnthalpy.getValue() + this.returnDeltaC(T)*(T-this.refEnthalpy.getRefT());
+        return this.refEnthalpy.getValue() + this.returnDeltaC(T, this.refEnthalpy.getRefT());
      }
 
     //clone

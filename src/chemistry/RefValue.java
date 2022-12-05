@@ -5,7 +5,7 @@ public class RefValue {
     double value;
 
     //constructor
-    public RefValue(double refT, double value)
+    public RefValue(double value, double refT)
     {
         this.refT = refT;
         this.value = value;

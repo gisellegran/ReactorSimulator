@@ -90,7 +90,7 @@ public abstract class Reactor implements SetOfODEs {
     //class methods
 
     //TODO: maybe delete this
-    public abstract MultiComponentMixture returnReactorOutput(MultiComponentMixture input, ReactionSet rxn, double delX, int maxIt);
+    public abstract MultiComponentMixture returnReactorOutput(MultiComponentMixture input, ReactionSet rxn, double delX, int maxIt) throws ReactorException;
 
 
     public abstract double[] calculateValue(double x, double[] y0);

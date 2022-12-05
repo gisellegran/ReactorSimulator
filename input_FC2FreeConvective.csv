@@ -29,7 +29,11 @@ mol flows
 Reactor
 pbr
 FIVE_INCHES
-cocurrent,7.87,293,10
+free_convective,7.87,298
 ergun_correlation,0.005,0.45,833
 performance
-1.504
+16.72
+
+
+
+

@@ -5,7 +5,6 @@ import chemistry.Reaction;
 import chemistry.ReactionSet;
 import chemistry.Specie;
 import reactor.Stream;
-import reactor.pressure_drop.PressureDropCondition;
 
 //maybe rename to tubular
 public abstract class HeatTransferEquation{
@@ -19,8 +18,8 @@ public abstract class HeatTransferEquation{
     public HeatTransferEquation(double U, double Ta){
         //todo limits on values
 
-        this.U = U;
-        this.Ta0 = Ta;
+        this.U = U;//W/m2K
+        this.Ta0 = Ta;//k
     }
     //copy constructor
     public HeatTransferEquation(HeatTransferEquation source){
@@ -51,10 +50,10 @@ public abstract class HeatTransferEquation{
         double deltaH = 0.;
         double T = mix.getT();
         for (int i = 0; i < rxns.length; i++) {
-            deltaH += rxns[i].returnReactionEnthalpy(T)*rxns[i].calcRefReactionRate(mix);
+            deltaH += rxns[i].returnReactionEnthalpy(T)*rxns[i].calcNormalizedReactionRate(mix);
         }
 
-        return deltaH;
+        return -deltaH;//positive if heat is generate negative if heat is lost
     }
 
     private double returnTotalFCp(Stream s){

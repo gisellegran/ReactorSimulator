@@ -36,7 +36,8 @@ public class PBR extends TubularReactor {
 
     //class methods
     public double returnA(){
-        return (4/this.pipeSize.returnInnerDiameter())/this.catalyst.returnBulkDensity();
+
+        return (4/this.pipeSize.returnInnerDiameter()+4/this.pipeSize.outerDiameter)/2/this.catalyst.returnBulkDensity();
     }
 
     //toString

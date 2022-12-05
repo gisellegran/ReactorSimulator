@@ -1,14 +1,14 @@
 package reactor;
 
 import chemistry.*;
-import numericalmethods.Euler;
+import numericalmethods.*;
 import reactor.heat_transfer.FreeConvective;
 import reactor.heat_transfer.HeatTransferCondition;
 import reactor.heat_transfer.HeatTransferEquation;
 import reactor.heat_transfer.HeatExchanger;
 import reactor.pressure_drop.PressureDropEquation;
 
-public abstract class TubularReactor extends Reactor {
+public abstract class TubularReactor extends Reactor implements NonLinearEquation {
 
     //instance variables
     NominalPipeSizes pipeSize; //pipe size of the reactor
@@ -25,9 +25,13 @@ public abstract class TubularReactor extends Reactor {
     private int g_Tindex; //index of temperature  in array
     private int g_TaIndex; //index of ambient temperature in array (temperature outside reactor)
     private double g_a; //heat transfer area per unit volume
-    private HeatTransferCondition g_heatCondition;
 
-    private double g_Ta; //ambiant temperature
+    private double g_Ta;//ambiant temperature
+    private double[] g_y_0;
+    private int g_maxIt;
+    private double g_delX;
+    private double g_x_f;
+    private HeatTransferCondition g_heatCondition;
 
     //main constructor
     public TubularReactor(double size, PressureDropEquation pDrop, HeatTransferEquation heatX, NominalPipeSizes pipeSize) {
@@ -46,11 +50,12 @@ public abstract class TubularReactor extends Reactor {
     }
 
     //global variables handlers
-    protected void setGlobalVariables(ReactionSet rxns, Stream input) {
+    protected void setGlobalVariables(ReactionSet rxns, Stream input, double x_f, double delX, int maxIt) {
         this.g_phase = input.returnPhase();
         this.g_reactions = rxns.clone();
         this.g_speciesInReactor = input.getSpecies();
         this.g_inputStream = input.clone();
+        this.g_heatCondition = this.getHeatX().getHeatTransferCondition();
         this.g_Pindex = this.g_speciesInReactor.length;
         this.g_Tindex = this.g_speciesInReactor.length+1;
         //we only need to consider Ta when we are in non adiabatic non isothermal conditions
@@ -59,6 +64,41 @@ public abstract class TubularReactor extends Reactor {
             this.g_Ta = this.getHeatX().getTa0(); //ambiant temperature
         }
         this.g_a = this.returnA();
+        this.g_delX = delX;
+        this.g_maxIt = maxIt;
+        this.g_x_f = x_f;
+        this.setY0Array(input);
+
+
+    }
+
+    private void setY0Array(Stream input){
+
+        //set y_0
+        //get total y array length; length = species + T + P
+        int n = this.g_speciesInReactor.length + 2;
+
+        //we only need to consider Ta when we are in non adiabatic non isothermal conditions
+        //this is checked when we set the global variables; if we are not in these conditions, g_TaIndex remains -1
+        //otherwise, we need a spot in the array to store this value
+        if (g_TaIndex > 0) n++;
+
+        this.g_y_0 = new double[n];
+
+        //get initial T & P
+        g_y_0[g_Tindex] = input.getT();
+        g_y_0[g_Pindex] = input.getP();
+        if (g_TaIndex > 0) g_y_0[g_TaIndex] = this.getHeatX().getTa0(); //set Ta0 if we are in non adiabatic/non isothermal conditions
+
+        //get inlet FlowRates
+        for (int i = 0; i < this.g_speciesInReactor.length; i++) {
+            if (input.hasSpecie(this.g_speciesInReactor[i])){
+                g_y_0[i] = input.returnSpecieFlowRate(this.g_speciesInReactor[i]);
+            } else {
+                // set flow rate of species which are not present in the input stream to 0
+                g_y_0[i] = 0;
+            }
+        }
 
     }
 
@@ -67,10 +107,15 @@ public abstract class TubularReactor extends Reactor {
         this.g_reactions = null;
         this.g_speciesInReactor = null;
         this.g_inputStream = null;
+        this.g_heatCondition = null;
         this.g_Tindex = -1;
         this.g_Pindex = -1;
         this.g_TaIndex = -1;
         this.g_a = -1;
+        this.g_y_0 = null;
+        this.g_delX = -1;
+        this.g_maxIt = -1;
+        this.g_x_f = -1;
     }
 
     //accessors
@@ -90,7 +135,7 @@ public abstract class TubularReactor extends Reactor {
     //class methods
 
     //TODO: maybe fix this to just take stream and remove it form the reactor class
-    public Stream returnReactorOutput(MultiComponentMixture input, ReactionSet rxn, double delX, int maxIt) {
+    public Stream returnReactorOutput(MultiComponentMixture input, ReactionSet rxn, double delX, int maxIt) throws ReactorException{
         if (input.getClass()  != Stream.class) {
             {throw new IllegalArgumentException("Stream required as input for tubular reactors");}
         }
@@ -98,8 +143,8 @@ public abstract class TubularReactor extends Reactor {
         return this.returnReactorOutputAtPoint(this.getSize(), (Stream)input, rxn, delX, maxIt);
     }
 
-    //point is either weight or volume depending if its g_a PFR of g_a PBR
-    public Stream returnReactorOutputAtPoint(double point, Stream input, ReactionSet rxn, double delX, int maxIt){
+    //point is either weight or volume depending if its a PFR or a PBR
+    public Stream returnReactorOutputAtPoint(double point, Stream input, ReactionSet rxn, double delX, int maxIt) throws ReactorException{
         //TODO; implement check that all species in the reactions ar ein the input stream and vice versa
         //checks to make first
         //check for null objects
@@ -112,44 +157,42 @@ public abstract class TubularReactor extends Reactor {
         }
 
         if (input.getClass()  != Stream.class) {
-            {throw new IllegalArgumentException("not the same class");}
+            {throw new IllegalArgumentException("must give stream as input");}
         }
 
-        setGlobalVariables(rxn, (Stream)input);
+        setGlobalVariables(rxn, (Stream)input, point, delX, maxIt);
+        double[] y_f;
 
-        //get total y array length; length = species + T + P
-        int n = this.g_speciesInReactor.length + 2;
-
-        //we only need to consider Ta when we are in non adiabatic non isothermal conditions
-        //this is checked when we set the global variables; if we are not in these conditions, g_TaIndex remains -1
-        //otherwise, we need a spot in the array to store this value
-        if (g_TaIndex > 0) n++;
-
-        double[] y_f = new double[n];
-        double[] y_0 = new double[n];
-
-        //get initial T & P
-        y_0[g_Tindex] = input.getT();
-        y_0[g_Pindex] = input.getP();
-        if (g_TaIndex > 0) y_0[g_TaIndex] = this.getHeatX().getTa0(); //set Ta0 if we are in non adiabatic/non isothermal conditions
-
-        //get inlet FlowRates
-        for (int i = 0; i < this.g_speciesInReactor.length; i++) {
-            if (input.hasSpecie(this.g_speciesInReactor[i])){
-                y_0[i] = input.returnSpecieFlowRate(this.g_speciesInReactor[i]);
-            } else {
-                // set flow rate of species which are not present in the input stream to 0
-                y_0[i] = 0;
+        if(this.g_heatCondition == HeatTransferCondition.COUNTERCURRENT) {
+            try {
+            //max temprature is 2000K
+            //here root is Ta that results in the inlet utility temprature at the reactor outlet
+            double Ta0 = RootFinder.findRoot(0, 2000, 1E-9, maxIt, this);
+            this.g_y_0[g_TaIndex] = Ta0;
+            y_f = CKRK45.integrate(0, point, this.g_y_0, delX, maxIt, 1E-9, 0.9, this);
             }
+            catch (RootFindingException e){
+                throw new ReactorException("cant solve cocurrent heat exchanger");
+            }
+
+        } else {
+        //y_f = Euler.integrate(0, point, y_0, delX, maxIt, this);
+        y_f = CKRK45.integrate(0, point, this.g_y_0, delX, maxIt, 1E-9, 0.9, this);
         }
 
-        y_f = Euler.integrate(0, point, y_0, delX, maxIt, this);
 
         Stream result = this.getStreamFromY(y_f);
         resetGlobalVariables();
 
         //generate stream
         return result;
+    }
+
+    public double returnValue(double x){
+        this.g_y_0[g_TaIndex] = x;
+        double[] y_f = CKRK45.integrate(0, this.g_x_f, this.g_y_0, this.g_delX, this.g_maxIt, 1E-9, 0.9, this);
+        return y_f[g_TaIndex] -g_Ta;
+
     }
 
     public abstract double returnA();
@@ -196,19 +239,23 @@ public abstract class TubularReactor extends Reactor {
 
     }
 
+
     public double[] calculateValue(double x, double[] y){
         Stream currentOutput = null;
-        try {
-            currentOutput = this.getStreamFromY(y);
-        }
-        catch (IllegalArgumentException e){
-            x = x;
-        }
+
+        currentOutput = this.getStreamFromY(y);
+
+
+
         double[] dely = new double[y.length];
         dely[this.g_Pindex] = this.getpDrop().calculateValue(currentOutput);
         dely[this.g_Tindex] = this.getHeatX().calculateDelT(g_a, currentOutput, g_reactions);
 
-        if (!(g_TaIndex<0)) dely[this.g_TaIndex] = ((HeatExchanger)this.getHeatX()).calculateDelTa(this.g_a, y[g_TaIndex], currentOutput.getT());//calculate delTa if in heat transfer conditions
+        //calculate dTa if we have a heat exchanger
+        if (!(g_TaIndex<0) && g_heatCondition != HeatTransferCondition.FREE_CONVECTIVE ) {
+
+            dely[this.g_TaIndex] = ((HeatExchanger)this.getHeatX()).calculateDelTa(this.g_a, y[g_TaIndex], currentOutput.getT());//calculate delTa if in heat transfer conditions
+        }
 
         double[] rates = this.g_reactions.returnNetRxnRates(currentOutput);
         for (int i = 0; i < this.g_speciesInReactor.length; i++) {

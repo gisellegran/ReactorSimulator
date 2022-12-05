@@ -133,7 +133,7 @@ public class TubularReactorDesigner implements NonLinearEquation {
     }
 
 
-    public double returnValue(double x){
+    public double returnValue(double x) {
         this.reactor.setSize(x);
         Stream output = this.reactor.returnReactorOutput(g_input, g_rxns, g_delX, g_maxIt);
         return output.returnSpecieFlowRate(g_desiredSpecie) - this.g_targetF;
